@@ -1,0 +1,21 @@
+{
+  "db": {
+    "host": "taha-tahvieh-db",
+    "port": 5432,
+    "user": "porestgres",
+    "pass": "postgres",
+    "name": "postgres",
+    "schema": "public"
+  },
+  "server": {
+    "port": 8080,
+    "token": "user:some_sample_token",
+    "proxy": "",
+    "new_update_offset": 0,
+    "bot_timeout": 60
+  },
+  "redis": {
+    "host": "taha-tahvieh-redis",
+    "port": 6379
+  }
+}
