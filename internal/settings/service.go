@@ -33,6 +33,11 @@ func (s *service) GetSetting(title string) (*domain.Setting, error) {
 }
 
 func (s *service) UpdateSetting(setting *domain.Setting) error {
-	//TODO implement me
-	panic("implement me")
+	err := s.repo.UpdateSetting(s.ctx, setting)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

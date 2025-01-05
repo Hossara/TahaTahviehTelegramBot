@@ -7,6 +7,6 @@ import (
 
 type Repo interface {
 	FindSettingByTitle(ctx context.Context, title string) (*domain.Setting, error)
-	UpdateSetting(ctx context.Context, setting domain.Setting) error
+	UpdateSetting(ctx context.Context, setting *domain.Setting) error
 	RunMigrations() error
 }

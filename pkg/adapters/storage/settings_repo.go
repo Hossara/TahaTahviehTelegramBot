@@ -27,9 +27,12 @@ func (r *settingRepo) FindSettingByTitle(ctx context.Context, title string) (*do
 	return mapper.ToDomainSetting(&setting), err
 }
 
-func (r *settingRepo) UpdateSetting(ctx context.Context, setting domain.Setting) error {
-	//TODO implement me
-	panic("implement me")
+func (r *settingRepo) UpdateSetting(ctx context.Context, setting *domain.Setting) error {
+	modelSetting := mapper.ToModelSetting(setting)
+
+	err := r.db.WithContext(ctx).Save(modelSetting).Error
+
+	return err
 }
 
 func (r *settingRepo) RunMigrations() error {
