@@ -17,5 +17,9 @@
   "redis": {
     "host": "taha-tahvieh-redis",
     "port": 6379
+  },
+  "constants": {
+    "admins": ["@Taha_tahvieh"],
+    "super_admins": ["@hossara_dev", "@Mohammad_ali_asaei"]
   }
 }

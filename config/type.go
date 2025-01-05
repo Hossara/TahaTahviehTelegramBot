@@ -27,3 +27,8 @@ type RedisConfig struct {
 	Host string `json:"host"`
 	Port uint   `json:"port"`
 }
+
+type Constants struct {
+	Admins      []string `json:"admins"`
+	SuperAdmins []string `json:"super_admins"`
+}
