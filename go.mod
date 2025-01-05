@@ -3,6 +3,7 @@ module taha_tahvieh_tg_bot
 go 1.23.2
 
 require (
+	github.com/go-gormigrate/gormigrate/v2 v2.1.3
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 	github.com/gofiber/fiber/v2 v2.52.5
 	golang.org/x/net v0.17.0

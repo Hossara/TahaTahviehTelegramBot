@@ -32,7 +32,7 @@ func Handle(ctx context.Context, cfg config.ServerConfig, ac app.App) {
 				}
 
 				if update.Message != nil && update.Message.IsCommand() {
-					//HandleCommands(ctx, update)
+					HandleCommands(update, ac)
 				}
 
 				// Handle messages in conversation

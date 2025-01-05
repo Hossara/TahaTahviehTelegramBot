@@ -24,7 +24,7 @@ func Bootstrap(ctx context.Context, cfg config.Config) error {
 
 	// Init telegram bot client
 	bot := InitClient(cfg.Server)
-	appContainer := di.MustNewApp(cfg, bot)
+	appContainer := di.MustNewApp(ctx, cfg, bot)
 
 	handlers.Handle(ctx, cfg.Server, appContainer)
 
