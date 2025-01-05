@@ -37,7 +37,7 @@ func Handle(ctx context.Context, cfg config.ServerConfig, ac app.App) {
 
 				// Handle messages in conversation
 				if update.Message != nil && !update.Message.IsCommand() {
-					//HandleConversation(ctx, update)
+					HandleConversations(update, ac)
 				}
 
 				// Handle callback queries (from InlineKeyboard)

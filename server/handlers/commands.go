@@ -5,6 +5,7 @@ import (
 	"taha_tahvieh_tg_bot/app"
 	"taha_tahvieh_tg_bot/pkg/bot"
 	"taha_tahvieh_tg_bot/server/commands"
+	"taha_tahvieh_tg_bot/server/conversations"
 )
 
 func handleMenu(update tgbotapi.Update, ac app.App) {
@@ -29,6 +30,13 @@ func HandleCommands(update tgbotapi.Update, ac app.App) {
 		commands.CommandStart(ac, update)
 	case "about":
 		commands.CommandAbout(ac, update)
+	case "edit_about":
+		userId := update.SentFrom().ID
+
+		ac.ResetUserState(userId)
+		state := ac.AppState(userId)
+
+		conversations.UpdateAbout(update, ac, state)
 	}
 	return
 }
