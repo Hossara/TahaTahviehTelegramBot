@@ -1,9 +1,10 @@
 package config
 
 type Config struct {
-	DB     DBConfig     `json:"db"`
-	Server ServerConfig `json:"server"`
-	Redis  RedisConfig  `json:"redis"`
+	DB        DBConfig     `json:"db"`
+	Server    ServerConfig `json:"server"`
+	Redis     RedisConfig  `json:"redis"`
+	Constants Constants    `json:"constants"`
 }
 
 type DBConfig struct {
