@@ -38,8 +38,7 @@ func CommandStart(ac app.App, update tgbotapi.Update) {
 
 	//msg.ReplyMarkup = keyboards.InlineKeyboard(menus.MainMenu, isAdmin)
 
-	ac.Bot().Send(msg)
-
+	bot.SendMessage(ac, msg)
 }
 
 func CommandAbout(ac app.App, update tgbotapi.Update) {
@@ -50,5 +49,5 @@ func CommandAbout(ac app.App, update tgbotapi.Update) {
 		return
 	}
 
-	bot.SendHtml(ac, update, setting.Content.Content)
+	bot.SendMarkdown(ac, update, setting.Content.Content)
 }
