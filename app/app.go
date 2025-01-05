@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"gorm.io/gorm"
+	"sync"
 	"taha_tahvieh_tg_bot/config"
 	"taha_tahvieh_tg_bot/internal/settings"
 	"taha_tahvieh_tg_bot/pkg/adapters/storage"
@@ -17,6 +18,7 @@ type app struct {
 	ctx             context.Context
 	db              *gorm.DB
 	bot             *tgbotapi.BotAPI
+	state           *appState
 	settingsService settingsPort.Service
 }
 
@@ -30,6 +32,44 @@ func (a *app) Bot() *tgbotapi.BotAPI {
 
 func (a *app) DB() *gorm.DB {
 	return a.db
+}
+
+func (a *app) setAppState() {
+	a.state = &appState{
+		userStates: make(map[int64]*UserState),
+		mutex:      &sync.Mutex{},
+	}
+}
+
+func (a *app) AppState(id int64) *UserState {
+	a.state.mutex.Lock()
+	defer a.state.mutex.Unlock()
+
+	if state, exists := a.state.userStates[id]; exists {
+		return state
+	}
+
+	state := &UserState{Step: 0, Data: make(map[string]string), Active: false}
+	a.state.userStates[id] = state
+	return state
+}
+
+func (a *app) DeleteUserState(id int64) {
+	a.state.mutex.Lock()
+	defer a.state.mutex.Unlock()
+	delete(a.state.userStates, id)
+}
+
+func (a *app) ResetUserState(id int64) {
+	a.state.mutex.Lock()
+	defer a.state.mutex.Unlock()
+
+	if _, exists := a.state.userStates[id]; exists {
+		delete(a.state.userStates, id)
+	}
+
+	state := &UserState{Step: 0, Data: make(map[string]string), Active: false}
+	a.state.userStates[id] = state
 }
 
 func (a *app) SettingsService() settingsPort.Service {
@@ -70,6 +110,8 @@ func (a *app) setBot() error {
 
 func NewApp(ctx context.Context, cfg config.Config, bot *tgbotapi.BotAPI) (App, error) {
 	a := &app{cfg: cfg, bot: bot, ctx: ctx}
+
+	a.setAppState()
 
 	if err := a.setBot(); err != nil {
 		return nil, err
