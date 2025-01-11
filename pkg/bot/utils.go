@@ -65,3 +65,10 @@ func IsSuperAdmin(update tgbotapi.Update, ac app.App) bool {
 func IsSuperRole(update tgbotapi.Update, ac app.App) bool {
 	return IsAdmin(update, ac) || IsSuperAdmin(update, ac)
 }
+
+func ResetUserState(update tgbotapi.Update, ac app.App) *app.UserState {
+	userId := update.SentFrom().ID
+
+	ac.ResetUserState(userId)
+	return ac.AppState(userId)
+}
