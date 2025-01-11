@@ -28,6 +28,10 @@ var BotCommands = []tgbotapi.BotCommand{
 		Description: "سوالات متداول",
 	},
 	{
+		Command:     "/help",
+		Description: "راهنما ربات",
+	},
+	{
 		Command:     "/about",
 		Description: "درباره ما",
 	},
@@ -37,5 +41,17 @@ var AdminCommands = []tgbotapi.BotCommand{
 	{
 		Command:     "/edit_about",
 		Description: "ویرایش پیام درباره من",
+	},
+	{
+		Command:     "/remove_product",
+		Description: "حذف محصول",
+	},
+	{
+		Command:     "/add_product",
+		Description: "افزودن محصول",
+	},
+	{
+		Command:     "/update_product",
+		Description: "ویرایش محصول",
 	},
 }

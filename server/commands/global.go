@@ -7,36 +7,11 @@ import (
 )
 
 func CommandStart(ac app.App, update tgbotapi.Update) {
-
-	/*	isAdmin := super_admin.IsSuperAdmin(update.Message.From.ID)
-
-		if isAdmin {
-			err := users.UpdateChatID(database.DB, update.SentFrom().ID, update.Message.Chat.ID)
-			if err != nil {
-				botLogger.Error(
-					"Error while updating chatID for User",
-					zap.Error(err),
-					zap.String("user_id", strconv.FormatInt(update.SentFrom().ID, 10)),
-				)
-			}
-		}
-		_, err := users.LoginUser(database.DB, update.SentFrom().ID, update.Message.Chat.ID)
-
-		if err != nil {
-			botLogger.Error(
-				"Error while calling login user",
-				zap.Error(err),
-				zap.String("user_id", strconv.FormatInt(update.SentFrom().ID, 10)),
-			)
-
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "خطا نگام دریافت اطلاعات کاربر")
-			bot.Send(msg)
-			return
-		}*/
+	isSuper := bot.IsSuperRole(update, ac)
 
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "سلام و درود به ربات طاها تهویه خوش آمدید. می‌توانید برای دریافت راهنمایی همین الان /help را وارد کنید.")
 
-	//msg.ReplyMarkup = keyboards.InlineKeyboard(menus.MainMenu, isAdmin)
+	msg.ReplyMarkup = keyboards.InlineKeyboard(menus.MainMenu, isSuper)
 
 	bot.SendMessage(ac, msg)
 }
