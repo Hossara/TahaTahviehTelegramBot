@@ -42,7 +42,7 @@ func Handle(ctx context.Context, cfg config.ServerConfig, ac app.App) {
 
 				// Handle callback queries (from InlineKeyboard)
 				if update.CallbackQuery != nil {
-					//HandleCallbacks(ctx, update)
+					HandleCallbacks(update, ac)
 				}
 			}
 		}
