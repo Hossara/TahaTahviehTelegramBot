@@ -20,11 +20,8 @@ func HandleConversations(update tgbotapi.Update, ac app.App) {
 		case "add_faq":
 			conversations.AddFaq(update, ac, userState)
 
-		case "update_faq": // ToDo
-			conversations.UpdateAbout(update, ac, userState)
-
-		case "remove_faq": // ToDo
-			conversations.UpdateAbout(update, ac, userState)
+		case "update_faq":
+			conversations.UpdateFaq(update, ac, userState)
 		}
 	}
 }

@@ -40,12 +40,10 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 		conversations.AddFaq(update, ac, state)
 
 	case action == "/remove_faq":
-		state := bot.ResetUserState(update, ac)
-		conversations.RemoveFaq(update, ac, state)
+		commands.RemoveFaqMenu(ac, update)
 
 	case action == "/update_faq":
-		state := bot.ResetUserState(update, ac)
-		conversations.UpdateFaq(update, ac, state)
+		commands.UpdateFaq(ac, update)
 
 	// -------------------- General Conversations
 	case action == "/edit_about":
@@ -63,5 +61,16 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 	switch {
 	case slices.Contains(actionPath, "get_faq") && actionPath[2] != "":
 		commands.Faq(ac, update, actionPath[2])
+
+	case slices.Contains(actionPath, "q_r_faq") && actionPath[2] != "":
+		commands.QuestionRemoveFaq(ac, update, actionPath[2])
+
+	case slices.Contains(actionPath, "del_faq") && actionPath[2] != "":
+		commands.RemoveFaq(ac, update, actionPath[2])
+
+	case slices.Contains(actionPath, "update_faq") && len(actionPath) > 2 && actionPath[2] != "":
+		state := bot.ResetUserState(update, ac)
+		state.Data["id"] = actionPath[2]
+		conversations.UpdateFaq(update, ac, state)
 	}
 }

@@ -44,9 +44,16 @@ func (r *faqRepo) FindByID(ctx context.Context, id domain.QuestionID) (*domain.F
 	return mapper.ToDomainFaq(&question), err
 }
 
+func (r *faqRepo) RemoveByID(ctx context.Context, id domain.QuestionID) error {
+	err := r.db.WithContext(ctx).Delete(&models.Faq{}, uint64(id)).Error
+
+	return err
+}
+
 func (r *faqRepo) Update(ctx context.Context, question *domain.FrequentQuestion) error {
-	//TODO implement me
-	panic("implement me")
+	err := r.db.WithContext(ctx).Save(mapper.ToModelFaq(question)).Error
+
+	return err
 }
 
 func (r *faqRepo) RunMigrations() error {

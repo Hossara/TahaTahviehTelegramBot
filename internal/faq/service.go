@@ -35,8 +35,10 @@ func (s *service) GetAllQuestions() ([]*domain.FrequentQuestion, error) {
 func (s *service) GetQuestion(id domain.QuestionID) (*domain.FrequentQuestion, error) {
 	return s.repo.FindByID(s.ctx, id)
 }
+func (s *service) DeleteQuestion(id domain.QuestionID) error {
+	return s.repo.RemoveByID(s.ctx, id)
+}
 
 func (s *service) UpdateQuestion(question *domain.FrequentQuestion) error {
-	//TODO implement me
-	panic("implement me")
+	return s.repo.Update(s.ctx, question)
 }
