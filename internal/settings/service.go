@@ -23,7 +23,7 @@ func (s *service) RunMigrations() error {
 }
 
 func (s *service) GetSetting(title string) (*domain.Setting, error) {
-	setting, err := s.repo.FindSettingByTitle(s.ctx, title)
+	setting, err := s.repo.FindByTitle(s.ctx, title)
 
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func (s *service) GetSetting(title string) (*domain.Setting, error) {
 }
 
 func (s *service) UpdateSetting(setting *domain.Setting) error {
-	err := s.repo.UpdateSetting(s.ctx, setting)
+	err := s.repo.Update(s.ctx, setting)
 
 	if err != nil {
 		return err

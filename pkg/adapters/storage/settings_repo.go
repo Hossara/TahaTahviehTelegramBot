@@ -19,7 +19,7 @@ func NewSettingRepo(db *gorm.DB) port.Repo {
 	return &settingRepo{db}
 }
 
-func (r *settingRepo) FindSettingByTitle(ctx context.Context, title string) (*domain.Setting, error) {
+func (r *settingRepo) FindByTitle(ctx context.Context, title string) (*domain.Setting, error) {
 	var setting models.Setting
 
 	err := r.db.WithContext(ctx).Where("title = ?", title).First(&setting).Error
@@ -27,7 +27,7 @@ func (r *settingRepo) FindSettingByTitle(ctx context.Context, title string) (*do
 	return mapper.ToDomainSetting(&setting), err
 }
 
-func (r *settingRepo) UpdateSetting(ctx context.Context, setting *domain.Setting) error {
+func (r *settingRepo) Update(ctx context.Context, setting *domain.Setting) error {
 	modelSetting := mapper.ToModelSetting(setting)
 
 	err := r.db.WithContext(ctx).Save(modelSetting).Error
@@ -36,6 +36,6 @@ func (r *settingRepo) UpdateSetting(ctx context.Context, setting *domain.Setting
 }
 
 func (r *settingRepo) RunMigrations() error {
-	migrator := gormigrate.New(r.db, gormigrate.DefaultOptions, migrations.GetUserMigrations())
+	migrator := gormigrate.New(r.db, gormigrate.DefaultOptions, migrations.GetSettingMigrations())
 	return migrator.Migrate()
 }
