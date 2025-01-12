@@ -23,6 +23,26 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 	case action == "/help":
 		commands.Help(ac, update)
 
+	// -------------------- FAQ
+	case action == "/faq":
+		commands.Faq(ac, update)
+
+	case action == "/faq_menu":
+		commands.FaqMenu(ac, update)
+
+	case action == "/add_faq":
+		state := bot.ResetUserState(update, ac)
+		conversations.AddFaq(update, ac, state)
+
+	case action == "/remove_faq":
+		state := bot.ResetUserState(update, ac)
+		conversations.RemoveFaq(update, ac, state)
+
+	case action == "/update_faq":
+		state := bot.ResetUserState(update, ac)
+		conversations.UpdateFaq(update, ac, state)
+
+	// -------------------- General Conversations
 	case action == "/edit_about":
 		state := bot.ResetUserState(update, ac)
 		conversations.UpdateAbout(update, ac, state)
