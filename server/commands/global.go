@@ -32,7 +32,7 @@ func About(ac app.App, update tgbotapi.Update) {
 func Menu(ac app.App, update tgbotapi.Update) {
 	isSuper := bot.IsSuperRole(update, ac)
 
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "منو خدمت شما")
+	msg := tgbotapi.NewMessage(update.FromChat().ID, "منو خدمت شما")
 
 	msg.ReplyMarkup = keyboards.InlineKeyboard(menus.MainMenu, isSuper)
 
