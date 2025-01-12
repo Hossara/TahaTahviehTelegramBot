@@ -2,6 +2,8 @@ package handlers
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"slices"
+	"strings"
 	"taha_tahvieh_tg_bot/app"
 	"taha_tahvieh_tg_bot/pkg/bot"
 	"taha_tahvieh_tg_bot/server/commands"
@@ -53,5 +55,13 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 	case action == "/edit_help":
 		state := bot.ResetUserState(update, ac)
 		conversations.UpdateHelp(update, ac, state)
+	}
+
+	// Check Path Variables
+	actionPath := strings.Split(action, "/")
+
+	switch {
+	case slices.Contains(actionPath, "get_faq") && actionPath[2] != "":
+		commands.Faq(ac, update, actionPath[2])
 	}
 }
