@@ -16,8 +16,10 @@ func HandleCommands(update tgbotapi.Update, ac app.App) {
 		commands.CommandAbout(ac, update)
 	case "menu":
 		commands.CommandMenu(ac, update)
-	case "consultation":
-		commands.Consultation(ac, update)
+	case "support":
+		commands.Support(ac, update)
+	case "help":
+		commands.Help(ac, update)
 
 	case "edit_about":
 		state := bot.ResetUserState(update, ac)

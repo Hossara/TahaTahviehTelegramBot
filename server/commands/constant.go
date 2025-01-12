@@ -16,10 +16,6 @@ var BotCommands = []tgbotapi.BotCommand{
 		Description: "لیست محصولات",
 	},
 	{
-		Command:     "/consultation",
-		Description: "مشاوره تلفنی",
-	},
-	{
 		Command:     "/support",
 		Description: "ارتباط‌ با پشتیبانی",
 	},

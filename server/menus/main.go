@@ -5,12 +5,9 @@ var MainMenu = [][]MenuItem{
 		{Path: "/product_list", IsAdmin: false, Name: "لیست محصولات"},
 	},
 	{
-		{Path: "/consultation", IsAdmin: false, Name: "مشاوره تلفنی"},
-	},
-	{
 		{Path: "/remove_product", IsAdmin: true, Name: "حذف محصول"},
-		{Path: "/add_product", IsAdmin: true, Name: "افزودن محصول"},
 		{Path: "/update_product", IsAdmin: true, Name: "ویرایش محصول"},
+		{Path: "/add_product", IsAdmin: true, Name: "افزودن محصول"},
 	},
 	{
 		{Path: "/support", IsAdmin: false, Name: "ارتباط‌ با پشتیبانی"},
