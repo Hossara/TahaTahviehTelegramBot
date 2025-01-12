@@ -13,6 +13,8 @@ func HandleConversations(update tgbotapi.Update, ac app.App) {
 		switch userState.Conversation {
 		case "update_about":
 			conversations.UpdateAbout(update, ac, userState)
+		case "update_help":
+			conversations.UpdateHelp(update, ac, userState)
 		}
 	}
 }

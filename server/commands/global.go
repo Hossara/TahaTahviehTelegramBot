@@ -42,3 +42,14 @@ func CommandMenu(ac app.App, update tgbotapi.Update) {
 func Support(ac app.App, update tgbotapi.Update) {
 	bot.SendText(ac, update, "برای دریافت مشاوره، با آیدی @Taha_tahvieh در ارتباط باشید.")
 }
+
+func Help(ac app.App, update tgbotapi.Update) {
+	help, err := ac.SettingsService().GetSetting("help")
+
+	if err != nil {
+		bot.SendText(ac, update, "خطایی در سرور رخ داد!")
+		return
+	}
+
+	bot.SendMarkdown(ac, update, help.Content.Content)
+}

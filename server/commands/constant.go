@@ -37,6 +37,9 @@ var AdminCommands = []tgbotapi.BotCommand{
 	{
 		Command:     "/edit_about",
 		Description: "ویرایش پیام درباره من",
+	}, {
+		Command:     "/edit_help",
+		Description: "ویرایش پیام راهنمای ربات",
 	},
 	{
 		Command:     "/remove_product",

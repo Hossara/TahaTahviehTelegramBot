@@ -17,7 +17,11 @@ var MainMenu = [][]MenuItem{
 		{Path: "/edit_faq", IsAdmin: true, Name: "ویرایش سوالات متداول"},
 	},
 	{
-		{Path: "/about", IsAdmin: false, Name: "درباره ما"},
 		{Path: "/edit_about", IsAdmin: true, Name: "ویرایش درباره ما"},
+		{Path: "/about", IsAdmin: false, Name: "درباره ما"},
+	},
+	{
+		{Path: "/edit_help", IsAdmin: true, Name: "ویرایش راهنمای ربات"},
+		{Path: "/help", IsAdmin: false, Name: "راهنمای ربات"},
 	},
 }
