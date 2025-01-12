@@ -38,3 +38,7 @@ func CommandMenu(ac app.App, update tgbotapi.Update) {
 
 	bot.SendMessage(ac, msg)
 }
+
+func Consultation(ac app.App, update tgbotapi.Update) {
+	bot.SendText(ac, update, "برای دریافت مشاوره، با آیدی @Taha_tahvieh در ارتباط باشید.")
+}

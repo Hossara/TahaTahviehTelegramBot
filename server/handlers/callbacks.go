@@ -16,12 +16,11 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 	case action == "/about":
 		commands.CommandAbout(ac, update)
 
+	case action == "/consultation":
+		commands.Consultation(ac, update)
+
 	case action == "/edit_about":
 		state := bot.ResetUserState(update, ac)
 		conversations.UpdateAbout(update, ac, state)
-
-	case action == "/register_consultation":
-		state := bot.ResetUserState(update, ac)
-		conversations.RegisterConsultation(update, ac, state)
 	}
 }
