@@ -13,8 +13,9 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 	//chatID := update.CallbackQuery.Message.Chat.ID
 
 	switch {
+	// -------------------- General
 	case action == "/about":
-		commands.CommandAbout(ac, update)
+		commands.About(ac, update)
 
 	case action == "/support":
 		commands.Support(ac, update)

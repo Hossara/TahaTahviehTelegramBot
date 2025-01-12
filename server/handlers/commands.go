@@ -10,12 +10,13 @@ import (
 
 func HandleCommands(update tgbotapi.Update, ac app.App) {
 	switch update.Message.Command() {
+	// -------------------- General
 	case "start":
-		commands.CommandStart(ac, update)
+		commands.Start(ac, update)
 	case "about":
-		commands.CommandAbout(ac, update)
+		commands.About(ac, update)
 	case "menu":
-		commands.CommandMenu(ac, update)
+		commands.Menu(ac, update)
 	case "support":
 		commands.Support(ac, update)
 	case "help":
