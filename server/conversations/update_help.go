@@ -27,6 +27,8 @@ func UpdateHelp(update tgbotapi.Update, ac app.App, state *app.UserState) {
 			return
 		}
 
+		bot.SendText(ac, update, "در حال ویرایش متن راهنمای ربات...")
+
 		setting, err := ac.SettingsService().GetSetting("help")
 
 		if err != nil {

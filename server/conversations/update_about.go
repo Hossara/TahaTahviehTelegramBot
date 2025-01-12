@@ -27,6 +27,8 @@ func UpdateAbout(update tgbotapi.Update, ac app.App, state *app.UserState) {
 			return
 		}
 
+		bot.SendText(ac, update, "در حال ویرایش متن درباره ما...")
+
 		setting, err := ac.SettingsService().GetSetting("about")
 
 		if err != nil {
