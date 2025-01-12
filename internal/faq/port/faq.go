@@ -1,0 +1,13 @@
+package port
+
+import (
+	"taha_tahvieh_tg_bot/internal/faq/domain"
+)
+
+type Service interface {
+	GetAllQuestions() ([]*domain.FrequentQuestion, error)
+	GetQuestion(title string) (*domain.FrequentQuestion, error)
+	AddQuestion(question *domain.FrequentQuestion) error
+	UpdateQuestion(question *domain.FrequentQuestion) error
+	RunMigrations() error
+}
