@@ -5,11 +5,13 @@ import (
 	"gorm.io/gorm"
 	"sync"
 	"taha_tahvieh_tg_bot/config"
+	"taha_tahvieh_tg_bot/internal/faq"
 	"taha_tahvieh_tg_bot/internal/settings"
 	"taha_tahvieh_tg_bot/pkg/adapters/storage"
 	"taha_tahvieh_tg_bot/pkg/postgres"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	faqPort "taha_tahvieh_tg_bot/internal/faq/port"
 	settingsPort "taha_tahvieh_tg_bot/internal/settings/port"
 )
 
@@ -20,6 +22,7 @@ type app struct {
 	bot             *tgbotapi.BotAPI
 	state           *appState
 	settingsService settingsPort.Service
+	faqService      faqPort.Service
 }
 
 func (a *app) Config() config.Config {
@@ -78,7 +81,7 @@ func (a *app) SettingsService() settingsPort.Service {
 			a.settingsService = settings.NewService(a.ctx, storage.NewSettingRepo(a.db))
 
 			if err := a.settingsService.RunMigrations(); err != nil {
-				panic("failed to run migrations")
+				panic("failed to run migrations for faq setting!")
 			}
 
 			return a.settingsService
@@ -88,6 +91,24 @@ func (a *app) SettingsService() settingsPort.Service {
 	}
 
 	return a.settingsService
+}
+
+func (a *app) FaqService() faqPort.Service {
+	if a.faqService == nil {
+		if a.db != nil {
+			a.faqService = faq.NewService(a.ctx, storage.NewFaqRepo(a.db))
+
+			if err := a.faqService.RunMigrations(); err != nil {
+				panic("failed to run migrations for faq service!")
+			}
+
+			return a.faqService
+		}
+
+		return nil
+	}
+
+	return a.faqService
 }
 
 func (a *app) setBot() error {
