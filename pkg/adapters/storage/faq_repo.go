@@ -36,9 +36,12 @@ func (r *faqRepo) FindAll(ctx context.Context) ([]*domain.FrequentQuestion, erro
 	}), err
 }
 
-func (r *faqRepo) FindByTitle(ctx context.Context, title string) (*domain.FrequentQuestion, error) {
-	//TODO implement me
-	panic("implement me")
+func (r *faqRepo) FindByID(ctx context.Context, id domain.QuestionID) (*domain.FrequentQuestion, error) {
+	var question models.Faq
+
+	err := r.db.WithContext(ctx).Where("id = ?", id).First(&question).Error
+
+	return mapper.ToDomainFaq(&question), err
 }
 
 func (r *faqRepo) Update(ctx context.Context, question *domain.FrequentQuestion) error {

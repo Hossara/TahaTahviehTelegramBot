@@ -32,9 +32,8 @@ func (s *service) GetAllQuestions() ([]*domain.FrequentQuestion, error) {
 	return s.repo.FindAll(s.ctx)
 }
 
-func (s *service) GetQuestion(title string) (*domain.FrequentQuestion, error) {
-	//TODO implement me
-	panic("implement me")
+func (s *service) GetQuestion(id domain.QuestionID) (*domain.FrequentQuestion, error) {
+	return s.repo.FindByID(s.ctx, id)
 }
 
 func (s *service) UpdateQuestion(question *domain.FrequentQuestion) error {

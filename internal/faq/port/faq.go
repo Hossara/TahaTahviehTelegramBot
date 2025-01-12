@@ -6,7 +6,7 @@ import (
 
 type Service interface {
 	GetAllQuestions() ([]*domain.FrequentQuestion, error)
-	GetQuestion(title string) (*domain.FrequentQuestion, error)
+	GetQuestion(id domain.QuestionID) (*domain.FrequentQuestion, error)
 	AddQuestion(question *domain.FrequentQuestion) error
 	UpdateQuestion(question *domain.FrequentQuestion) error
 	RunMigrations() error

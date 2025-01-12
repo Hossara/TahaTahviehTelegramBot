@@ -8,7 +8,7 @@ import (
 type Repo interface {
 	FindAll(ctx context.Context) ([]*domain.FrequentQuestion, error)
 	Insert(ctx context.Context, question *domain.FrequentQuestion) (domain.QuestionID, error)
-	FindByTitle(ctx context.Context, title string) (*domain.FrequentQuestion, error)
+	FindByID(ctx context.Context, id domain.QuestionID) (*domain.FrequentQuestion, error)
 	Update(ctx context.Context, question *domain.FrequentQuestion) error
 	RunMigrations() error
 }
