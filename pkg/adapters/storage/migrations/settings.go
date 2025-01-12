@@ -8,7 +8,7 @@ import (
 	"github.com/go-gormigrate/gormigrate/v2"
 )
 
-func GetUserMigrations() []*gormigrate.Migration {
+func GetSettingMigrations() []*gormigrate.Migration {
 	return []*gormigrate.Migration{
 		{
 			ID: helpers.GenerateMigrationID("add_settings_table"),
