@@ -67,7 +67,3 @@ func Help(ac app.App, update tgbotapi.Update) {
 
 	bot.SendMarkdown(ac, update, help.Content.Content)
 }
-
-func Faq(ac app.App, update tgbotapi.Update) {
-	// ToDo
-}

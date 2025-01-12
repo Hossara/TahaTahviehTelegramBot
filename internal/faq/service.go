@@ -29,8 +29,7 @@ func (s *service) AddQuestion(question *domain.FrequentQuestion) error {
 }
 
 func (s *service) GetAllQuestions() ([]*domain.FrequentQuestion, error) {
-	//TODO implement me
-	panic("implement me")
+	return s.repo.FindAll(s.ctx)
 }
 
 func (s *service) GetQuestion(title string) (*domain.FrequentQuestion, error) {

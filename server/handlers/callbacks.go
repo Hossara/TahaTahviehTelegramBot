@@ -28,7 +28,7 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 
 	// -------------------- FAQ
 	case action == "/faq":
-		commands.Faq(ac, update)
+		commands.FaqList(ac, update)
 
 	case action == "/faq_menu":
 		commands.FaqMenu(ac, update)

@@ -24,7 +24,7 @@ func HandleCommands(update tgbotapi.Update, ac app.App) {
 
 	// -------------------- FAQ
 	case "faq":
-		commands.Faq(ac, update)
+		commands.FaqList(ac, update)
 
 	case "faq_menu":
 		commands.FaqMenu(ac, update)
