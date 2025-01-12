@@ -34,6 +34,7 @@ var BotCommands = []tgbotapi.BotCommand{
 }
 
 var AdminCommands = []tgbotapi.BotCommand{
+	// Static Replays
 	{
 		Command:     "/edit_about",
 		Description: "ویرایش پیام درباره من",
@@ -41,6 +42,7 @@ var AdminCommands = []tgbotapi.BotCommand{
 		Command:     "/edit_help",
 		Description: "ویرایش پیام راهنمای ربات",
 	},
+	// Product
 	{
 		Command:     "/remove_product",
 		Description: "حذف محصول",
@@ -52,5 +54,22 @@ var AdminCommands = []tgbotapi.BotCommand{
 	{
 		Command:     "/update_product",
 		Description: "ویرایش محصول",
+	},
+	// FAQ
+	{
+		Command:     "/faq_menu",
+		Description: "منو سوال پرتکرار",
+	},
+	{
+		Command:     "/add_faq",
+		Description: "افزودن سوال پرتکرار",
+	},
+	{
+		Command:     "/remove_faq",
+		Description: "حذف سوال پرتکرار",
+	},
+	{
+		Command:     "/update_faq",
+		Description: "ویرایش سوال پرتکرار",
 	},
 }

@@ -14,7 +14,7 @@ var MainMenu = [][]MenuItem{
 		{Path: "/faq", IsAdmin: false, Name: "سوالات متداول"},
 	},
 	{
-		{Path: "/edit_faq", IsAdmin: true, Name: "ویرایش سوالات متداول"},
+		{Path: "/faq_menu", IsAdmin: true, Name: "منو سوالات پرتکرار"},
 	},
 	{
 		{Path: "/edit_about", IsAdmin: true, Name: "ویرایش درباره ما"},
