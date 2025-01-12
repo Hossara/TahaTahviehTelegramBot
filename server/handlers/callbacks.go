@@ -17,6 +17,9 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 	case action == "/about":
 		commands.About(ac, update)
 
+	case action == "/menu":
+		commands.Menu(ac, update)
+
 	case action == "/support":
 		commands.Support(ac, update)
 
