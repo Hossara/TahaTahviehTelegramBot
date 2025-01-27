@@ -1,0 +1,36 @@
+x-taha-tahvieh: &taha-tahvieh
+  image: quay.io/minio/minio
+  command: server --console-address ":9090" http://ttminiosv1/data{1...2}
+  env_file: minio/.env
+  restart: unless-stopped
+  ports:
+    - "9090:9090"
+    - "9000:9000"
+  networks:
+    - taha-tahvieh-network
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+    interval: 30s
+    timeout: 10s
+    retries: 3
+    start_period: 30s
+
+services:
+  taha-tahvieh-minio-sv1:
+    <<: *taha-tahvieh
+    hostname: ttminiosv1
+    container_name: taha-tahvieh-minio-sv1
+    volumes:
+      - taha-tahvieh-storage1:/data1
+      - taha-tahvieh-storage2:/data2
+
+volumes:
+  taha-tahvieh-storage1:
+    driver: local
+  taha-tahvieh-storage2:
+    driver: local
+
+networks:
+  taha-tahvieh-network:
+    name: taha-tahvieh-network
+    external: true

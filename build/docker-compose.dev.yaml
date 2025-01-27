@@ -6,17 +6,6 @@ services:
     volumes:
       - taha-tahvieh-redis-volume:/data
 
-  taha-tahvieh-app:
-    container_name: taha-tahvieh-app
-    network_mode: host
-    build:
-      context: ../
-      dockerfile: ./build/Dockerfile
-    volumes:
-      - "../config.json:/app/bin/config.json"
-    depends_on:
-      - taha-tahvieh-redis
-
 volumes:
   taha-tahvieh-redis-volume:
     driver: local
