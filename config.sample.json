@@ -14,6 +14,12 @@
     "new_update_offset": 0,
     "bot_timeout": 60
   },
+  "minio": {
+    "endpoint": "",
+    "access_key_id": "",
+    "secret_access_key": "",
+    "ssl": false
+  },
   "redis": {
     "host": "taha-tahvieh-redis",
     "port": 6379

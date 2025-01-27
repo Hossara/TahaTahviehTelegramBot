@@ -5,6 +5,7 @@ type Config struct {
 	Server    ServerConfig `json:"server"`
 	Redis     RedisConfig  `json:"redis"`
 	Constants Constants    `json:"constants"`
+	Minio     MinioConfig  `json:"minio"`
 }
 
 type DBConfig struct {
@@ -27,6 +28,13 @@ type ServerConfig struct {
 type RedisConfig struct {
 	Host string `json:"host"`
 	Port uint   `json:"port"`
+}
+
+type MinioConfig struct {
+	Endpoint        string `json:"endpoint"`
+	AccessKeyID     string `json:"access_key_id"`
+	SecretAccessKey string `json:"secret_access_key"`
+	SSL             bool   `json:"ssl"`
 }
 
 type Constants struct {
