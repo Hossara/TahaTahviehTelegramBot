@@ -2,8 +2,6 @@ services:
   taha-tahvieh-redis:
     image: redis/redis-stack:latest
     container_name: taha-tahvieh-redis
-    ports:
-      - "8003:8001"
     networks:
       - taha-tahvieh-network
     volumes:
@@ -15,7 +13,7 @@ services:
       - taha-tahvieh-network
     build:
       context: ../
-      dockerfile: ./build/Dockerfile
+      dockerfile: dockerfiles/prod.dockerfile
     volumes:
       - "../config.json:/app/bin/config.json"
     depends_on:
