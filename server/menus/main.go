@@ -2,15 +2,17 @@ package menus
 
 var MainMenu = [][]MenuItem{
 	{
-		{Path: "/product_list", IsAdmin: false, Name: "لیست محصولات"},
+		{Path: "/search", IsAdmin: false, Name: "جستجوی محصول"},
+		{Path: "/manage_product", IsAdmin: true, Name: "مدیریت محصولات"},
 	},
 	{
-		{Path: "/remove_product", IsAdmin: true, Name: "حذف محصول"},
-		{Path: "/update_product", IsAdmin: true, Name: "ویرایش محصول"},
-		{Path: "/add_product", IsAdmin: true, Name: "افزودن محصول"},
+		{Path: "/manage_brands", IsAdmin: true, Name: "مدیریت برند ها"},
+		{Path: "/manage_product_types", IsAdmin: true, Name: "مدیریت دسته‌بندی ها"},
 	},
 	{
 		{Path: "/support", IsAdmin: false, Name: "ارتباط‌ با پشتیبانی"},
+	},
+	{
 		{Path: "/faq", IsAdmin: false, Name: "سوالات متداول"},
 	},
 	{
