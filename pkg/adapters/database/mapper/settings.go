@@ -3,7 +3,7 @@ package mapper
 import (
 	"encoding/json"
 	"taha_tahvieh_tg_bot/internal/settings/domain"
-	"taha_tahvieh_tg_bot/pkg/adapters/storage/models"
+	"taha_tahvieh_tg_bot/pkg/adapters/database/models"
 	"time"
 )
 

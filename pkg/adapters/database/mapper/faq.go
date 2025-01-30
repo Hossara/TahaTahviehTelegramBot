@@ -2,7 +2,7 @@ package mapper
 
 import (
 	"taha_tahvieh_tg_bot/internal/faq/domain"
-	"taha_tahvieh_tg_bot/pkg/adapters/storage/models"
+	"taha_tahvieh_tg_bot/pkg/adapters/database/models"
 	"time"
 )
 
