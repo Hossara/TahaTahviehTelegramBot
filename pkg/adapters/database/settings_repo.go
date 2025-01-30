@@ -1,4 +1,4 @@
-package storage
+package database
 
 import (
 	"context"
@@ -6,9 +6,9 @@ import (
 	"gorm.io/gorm"
 	"taha_tahvieh_tg_bot/internal/settings/domain"
 	"taha_tahvieh_tg_bot/internal/settings/port"
-	"taha_tahvieh_tg_bot/pkg/adapters/storage/mapper"
-	"taha_tahvieh_tg_bot/pkg/adapters/storage/migrations"
-	"taha_tahvieh_tg_bot/pkg/adapters/storage/models"
+	"taha_tahvieh_tg_bot/pkg/adapters/database/helpers"
+	"taha_tahvieh_tg_bot/pkg/adapters/database/mapper"
+	"taha_tahvieh_tg_bot/pkg/adapters/database/models"
 )
 
 type settingRepo struct {
@@ -36,6 +36,10 @@ func (r *settingRepo) Update(ctx context.Context, setting *domain.Setting) error
 }
 
 func (r *settingRepo) RunMigrations() error {
-	migrator := gormigrate.New(r.db, gormigrate.DefaultOptions, migrations.GetSettingMigrations())
+	migrator := gormigrate.New(
+		r.db, gormigrate.DefaultOptions,
+		helpers.GetMigrations[models.Setting]("settings", &models.Setting{}),
+	)
+
 	return migrator.Migrate()
 }

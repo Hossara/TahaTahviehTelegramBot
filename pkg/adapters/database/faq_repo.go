@@ -1,4 +1,4 @@
-package storage
+package database
 
 import (
 	"context"
@@ -6,9 +6,9 @@ import (
 	"gorm.io/gorm"
 	"taha_tahvieh_tg_bot/internal/faq/domain"
 	"taha_tahvieh_tg_bot/internal/faq/port"
-	"taha_tahvieh_tg_bot/pkg/adapters/storage/mapper"
-	"taha_tahvieh_tg_bot/pkg/adapters/storage/migrations"
-	"taha_tahvieh_tg_bot/pkg/adapters/storage/models"
+	"taha_tahvieh_tg_bot/pkg/adapters/database/helpers"
+	"taha_tahvieh_tg_bot/pkg/adapters/database/mapper"
+	"taha_tahvieh_tg_bot/pkg/adapters/database/models"
 	"taha_tahvieh_tg_bot/pkg/utils"
 )
 
@@ -57,6 +57,10 @@ func (r *faqRepo) Update(ctx context.Context, question *domain.FrequentQuestion)
 }
 
 func (r *faqRepo) RunMigrations() error {
-	migrator := gormigrate.New(r.db, gormigrate.DefaultOptions, migrations.GetFaqMigrations())
+	migrator := gormigrate.New(
+		r.db, gormigrate.DefaultOptions,
+		helpers.GetMigrations[models.Faq]("faq", &models.Faq{}),
+	)
+
 	return migrator.Migrate()
 }
