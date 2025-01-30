@@ -59,15 +59,19 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 	actionPath := strings.Split(action, "/")
 
 	switch {
+	// Get Exact FAQ
 	case slices.Contains(actionPath, "get_faq") && actionPath[2] != "":
 		commands.Faq(ac, update, actionPath[2])
 
+	// Delete Exact FAQ Confirmations Question
 	case slices.Contains(actionPath, "q_r_faq") && actionPath[2] != "":
 		commands.QuestionRemoveFaq(ac, update, actionPath[2])
 
+	// Delete Exact FAQ
 	case slices.Contains(actionPath, "del_faq") && actionPath[2] != "":
 		commands.RemoveFaq(ac, update, actionPath[2])
 
+	// Update Exact FAQ
 	case slices.Contains(actionPath, "update_faq") && len(actionPath) > 2 && actionPath[2] != "":
 		state := bot.ResetUserState(update, ac)
 		state.Data["id"] = actionPath[2]
