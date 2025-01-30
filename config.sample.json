@@ -25,7 +25,8 @@
     "port": 6379
   },
   "constants": {
-    "admins": ["@Taha_tahvieh"],
-    "super_admins": ["@hossara_dev", "@Mohammad_ali_asaei"]
+    "channel": "taha_tahvieh_channel",
+    "admins": ["Taha_tahvieh"],
+    "super_admins": ["hossara_dev", "Mohammad_ali_asaei"]
   }
 }

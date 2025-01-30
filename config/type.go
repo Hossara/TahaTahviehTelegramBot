@@ -38,6 +38,7 @@ type MinioConfig struct {
 }
 
 type Constants struct {
+	Channel     string   `json:"channel"`
 	Admins      []string `json:"admins"`
 	SuperAdmins []string `json:"super_admins"`
 }

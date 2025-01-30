@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"taha_tahvieh_tg_bot/app"
 	"taha_tahvieh_tg_bot/config"
@@ -24,6 +25,23 @@ func handleMenu(update tgbotapi.Update, ac app.App) {
 	bot.SendRequest(ac, cmdCfg)
 }
 
+func checkUserSubscription(bot *tgbotapi.BotAPI, channel string, userID int64) (bool, error) {
+	chatMemberConfig := tgbotapi.GetChatMemberConfig{
+		ChatConfigWithUser: tgbotapi.ChatConfigWithUser{
+			SuperGroupUsername: channel,
+			UserID:             userID,
+		},
+	}
+
+	member, err := bot.GetChatMember(chatMemberConfig)
+
+	if err != nil {
+		return false, err
+	}
+
+	return member.Status == "member" || member.Status == "administrator" || member.Status == "creator", nil
+}
+
 func Handle(ctx context.Context, cfg config.ServerConfig, ac app.App) {
 	u := tgbotapi.NewUpdate(int(cfg.NewUpdateOffset))
 	u.Timeout = int(cfg.BotTimeout)
@@ -41,6 +59,18 @@ func Handle(ctx context.Context, cfg config.ServerConfig, ac app.App) {
 				if !ok {
 					log.Println("Updates channel closed.")
 					return
+				}
+
+				channel := ac.Config().Constants.Channel
+
+				sub, err := checkUserSubscription(ac.Bot(), channel, update.SentFrom().ID)
+
+				if !sub || err != nil {
+					bot.SendText(
+						ac, update,
+						fmt.Sprintf("برای استفاده از بات، ابتدا در کانال %s عضو شوید.", channel),
+					)
+					continue
 				}
 
 				// Handle command menu
