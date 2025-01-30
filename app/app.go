@@ -6,23 +6,32 @@ import (
 	"sync"
 	"taha_tahvieh_tg_bot/config"
 	"taha_tahvieh_tg_bot/internal/faq"
+	"taha_tahvieh_tg_bot/internal/product"
 	"taha_tahvieh_tg_bot/internal/settings"
-	"taha_tahvieh_tg_bot/pkg/adapters/storage"
+	"taha_tahvieh_tg_bot/internal/storage"
+	"taha_tahvieh_tg_bot/pkg/adapters/database"
+	"taha_tahvieh_tg_bot/pkg/minio"
 	"taha_tahvieh_tg_bot/pkg/postgres"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	faqPort "taha_tahvieh_tg_bot/internal/faq/port"
+	productPort "taha_tahvieh_tg_bot/internal/product/port"
 	settingsPort "taha_tahvieh_tg_bot/internal/settings/port"
+	storagePort "taha_tahvieh_tg_bot/internal/storage/port"
+	storageAdapter "taha_tahvieh_tg_bot/pkg/adapters/storage"
 )
 
 type app struct {
-	cfg             config.Config
-	ctx             context.Context
-	db              *gorm.DB
-	bot             *tgbotapi.BotAPI
-	state           *appState
-	settingsService settingsPort.Service
+	cfg   config.Config
+	ctx   context.Context
+	db    *gorm.DB
+	bot   *tgbotapi.BotAPI
+	state *appState
+
 	faqService      faqPort.Service
+	productService  productPort.Service
+	settingsService settingsPort.Service
+	storageService  storagePort.Service
 }
 
 func (a *app) Config() config.Config {
@@ -75,19 +84,62 @@ func (a *app) ResetUserState(id int64) {
 	a.state.userStates[id] = state
 }
 
-func (a *app) SettingsService() settingsPort.Service {
-	if a.settingsService == nil {
-		if a.db != nil {
-			a.settingsService = settings.NewService(a.ctx, storage.NewSettingRepo(a.db))
+func (a *app) ProductService() productPort.Service {
+	if a.productService == nil {
+		a.productService = product.NewService(
+			a.ctx, database.NewProductRepo(a.db), database.NewProductMetaRepo(a.db),
+		)
 
-			if err := a.settingsService.RunMigrations(); err != nil {
-				panic("failed to run migrations for faq setting!")
-			}
-
-			return a.settingsService
+		if err := a.productService.RunProductMigrations(); err != nil {
+			panic("failed to run migrations for product service!")
 		}
 
-		return nil
+		if err := a.productService.RunBrandMigrations(); err != nil {
+			panic("failed to run migrations for product brand service!")
+		}
+
+		if err := a.productService.RunProductTypeMigrations(); err != nil {
+			panic("failed to run migrations for product type service!")
+		}
+
+		return a.productService
+	}
+
+	return a.productService
+}
+
+func (a *app) StorageService() storagePort.Service {
+	return a.storageService
+}
+
+func (a *app) setStorageService() {
+	if a.storageService == nil {
+		minioConfig := a.cfg.Minio
+
+		client := storageAdapter.NewStorageRepo(minio.Config{
+			Endpoint:        minioConfig.Endpoint,
+			AccessKeyID:     minioConfig.AccessKeyID,
+			SecretAccessKey: minioConfig.SecretAccessKey,
+			SSL:             minioConfig.SSL,
+		})
+
+		a.storageService = storage.NewService(a.ctx, database.NewStorageRepo(a.db), client)
+
+		if err := a.storageService.RunMigrations(); err != nil {
+			panic("failed to run migrations for storage service!")
+		}
+	}
+}
+
+func (a *app) SettingsService() settingsPort.Service {
+	if a.settingsService == nil {
+		a.settingsService = settings.NewService(a.ctx, database.NewSettingRepo(a.db))
+
+		if err := a.settingsService.RunMigrations(); err != nil {
+			panic("failed to run migrations for faq setting!")
+		}
+
+		return a.settingsService
 	}
 
 	return a.settingsService
@@ -95,23 +147,19 @@ func (a *app) SettingsService() settingsPort.Service {
 
 func (a *app) FaqService() faqPort.Service {
 	if a.faqService == nil {
-		if a.db != nil {
-			a.faqService = faq.NewService(a.ctx, storage.NewFaqRepo(a.db))
+		a.faqService = faq.NewService(a.ctx, database.NewFaqRepo(a.db))
 
-			if err := a.faqService.RunMigrations(); err != nil {
-				panic("failed to run migrations for faq service!")
-			}
-
-			return a.faqService
+		if err := a.faqService.RunMigrations(); err != nil {
+			panic("failed to run migrations for faq service!")
 		}
 
-		return nil
+		return a.faqService
 	}
 
 	return a.faqService
 }
 
-func (a *app) setBot() error {
+func (a *app) setDB() error {
 	db, err := postgres.NewPsqlGormConnection(postgres.DBConnOptions{
 		Host:   a.cfg.DB.Host,
 		Port:   a.cfg.DB.Port,
@@ -132,11 +180,12 @@ func (a *app) setBot() error {
 func NewApp(ctx context.Context, cfg config.Config, bot *tgbotapi.BotAPI) (App, error) {
 	a := &app{cfg: cfg, bot: bot, ctx: ctx}
 
-	a.setAppState()
-
-	if err := a.setBot(); err != nil {
+	if err := a.setDB(); err != nil {
 		return nil, err
 	}
+
+	a.setAppState()
+	a.setStorageService()
 
 	return a, nil
 }
