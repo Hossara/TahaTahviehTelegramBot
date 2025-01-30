@@ -8,39 +8,26 @@ import (
 	"taha_tahvieh_tg_bot/app"
 	"taha_tahvieh_tg_bot/internal/faq/domain"
 	"taha_tahvieh_tg_bot/pkg/bot"
+	"taha_tahvieh_tg_bot/pkg/utils"
 	"taha_tahvieh_tg_bot/server/keyboards"
 	"taha_tahvieh_tg_bot/server/menus"
 )
 
-func GetFaqsMenu(questions []*domain.FrequentQuestion, action string) [][]menus.MenuItem {
-	var menu [][]menus.MenuItem
+func GetFaqsMenu(questions []*domain.FrequentQuestion, action string) []menus.MenuItem {
+	var menu []menus.MenuItem
 
-	for i := 0; i < len(questions); i += 2 {
-		var row []menus.MenuItem
-
-		row = append(row, menus.MenuItem{
-			Name:    questions[i].Question,
+	menu = utils.Map(questions, func(t *domain.FrequentQuestion) menus.MenuItem {
+		return menus.MenuItem{
+			Name:    t.Question,
 			IsAdmin: false,
-			Path:    fmt.Sprintf("/%s/%d", action, questions[i].QuestionID),
-		})
-
-		if i+1 < len(questions) {
-			row = append(row, menus.MenuItem{
-				Name:    questions[i+1].Question,
-				IsAdmin: false,
-				Path:    fmt.Sprintf("/%s/%d", action, questions[i+1].QuestionID),
-			})
+			Path:    fmt.Sprintf("/%s/%d", action, t.QuestionID),
 		}
+	})
 
-		menu = append(menu, row)
-	}
-
-	menu = append(menu, []menus.MenuItem{
-		{
-			Name:    "منو اصلی",
-			IsAdmin: false,
-			Path:    "/menu",
-		},
+	menu = append(menu, menus.MenuItem{
+		Name:    "منو اصلی",
+		IsAdmin: false,
+		Path:    "/menu",
 	})
 
 	return menu
@@ -56,7 +43,7 @@ func FaqList(ac app.App, update tgbotapi.Update) {
 
 	msg := tgbotapi.NewMessage(update.FromChat().ID, "برای دیدن پاسخ هر سوال بر روی عنوان آن کلیک کنید")
 
-	msg.ReplyMarkup = keyboards.InlineKeyboard(GetFaqsMenu(questions, "get_faq"), false)
+	msg.ReplyMarkup = keyboards.InlineKeyboardColumn(GetFaqsMenu(questions, "get_faq"), false)
 
 	bot.SendMessage(ac, msg)
 }
@@ -165,7 +152,7 @@ func RemoveFaqMenu(ac app.App, update tgbotapi.Update) {
 
 	msg := tgbotapi.NewMessage(update.FromChat().ID, "برای حذف هر سوال بر روی نام آن کلیک کنید")
 
-	msg.ReplyMarkup = keyboards.InlineKeyboard(GetFaqsMenu(questions, "q_r_faq"), false)
+	msg.ReplyMarkup = keyboards.InlineKeyboardColumn(GetFaqsMenu(questions, "q_r_faq"), false)
 
 	bot.SendMessage(ac, msg)
 }
@@ -180,7 +167,7 @@ func UpdateFaq(ac app.App, update tgbotapi.Update) {
 
 	msg := tgbotapi.NewMessage(update.FromChat().ID, "برای ویرایش هر سوال بر روی عنوان آن کلیک کنید")
 
-	msg.ReplyMarkup = keyboards.InlineKeyboard(GetFaqsMenu(questions, "update_faq"), false)
+	msg.ReplyMarkup = keyboards.InlineKeyboardColumn(GetFaqsMenu(questions, "update_faq"), false)
 
 	bot.SendMessage(ac, msg)
 }
