@@ -4,6 +4,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"taha_tahvieh_tg_bot/app"
 	"taha_tahvieh_tg_bot/pkg/bot"
+	"taha_tahvieh_tg_bot/server/constants"
 	"taha_tahvieh_tg_bot/server/keyboards"
 	"taha_tahvieh_tg_bot/server/menus"
 )
@@ -32,7 +33,7 @@ func About(ac app.App, update tgbotapi.Update) {
 func Menu(ac app.App, update tgbotapi.Update) {
 	isSuper := bot.IsSuperRole(update, ac)
 
-	msg := tgbotapi.NewMessage(update.FromChat().ID, "منو خدمت شما")
+	msg := tgbotapi.NewMessage(update.FromChat().ID, constants.MenuResponse)
 
 	msg.ReplyMarkup = keyboards.InlineKeyboard(menus.MainMenu, isSuper)
 
