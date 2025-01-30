@@ -143,6 +143,12 @@ func FaqMenu(ac app.App, update tgbotapi.Update) {
 }
 
 func RemoveFaqMenu(ac app.App, update tgbotapi.Update) {
+	isSuper := bot.IsSuperRole(update, ac)
+
+	if !isSuper {
+		return
+	}
+
 	questions, err := ac.FaqService().GetAllQuestions()
 
 	if err != nil {
@@ -158,6 +164,12 @@ func RemoveFaqMenu(ac app.App, update tgbotapi.Update) {
 }
 
 func UpdateFaq(ac app.App, update tgbotapi.Update) {
+	isSuper := bot.IsSuperRole(update, ac)
+
+	if !isSuper {
+		return
+	}
+
 	questions, err := ac.FaqService().GetAllQuestions()
 
 	if err != nil {
@@ -173,6 +185,12 @@ func UpdateFaq(ac app.App, update tgbotapi.Update) {
 }
 
 func RemoveFaq(ac app.App, update tgbotapi.Update, id string) {
+	isSuper := bot.IsSuperRole(update, ac)
+
+	if !isSuper {
+		return
+	}
+
 	qId, err := strconv.ParseUint(id, 10, 64)
 
 	if err != nil {
