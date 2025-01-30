@@ -1,6 +1,6 @@
 package domain
 
-type QuestionID uint8
+type QuestionID int64
 
 type FrequentQuestion struct {
 	QuestionID QuestionID

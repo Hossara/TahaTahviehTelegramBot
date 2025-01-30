@@ -1,6 +1,6 @@
 package domain
 
-type SettingID uint8
+type SettingID int64
 
 type Content struct {
 	Content string `json:"content"`
