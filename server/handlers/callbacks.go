@@ -8,6 +8,7 @@ import (
 	"taha_tahvieh_tg_bot/pkg/bot"
 	"taha_tahvieh_tg_bot/server/commands"
 	"taha_tahvieh_tg_bot/server/conversations"
+	"taha_tahvieh_tg_bot/server/menus"
 )
 
 func HandleCallbacks(update tgbotapi.Update, ac app.App) {
@@ -27,6 +28,29 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 
 	case action == "/help":
 		commands.Help(ac, update)
+
+	// -------------------- Search
+	case action == "/search":
+		commands.SearchProductMenu(ac, update)
+
+	case action == "/search_title":
+	case action == "/search_brand":
+		commands.SelectProductMenu(ac, update, "brand", "محصولات هر برند")
+	case action == "/search_type":
+		commands.SelectProductMenu(ac, update, "type", "محصولات هر دسته‌بندی")
+
+	// -------------------- Product Management
+	case action == "/manage_product":
+		commands.ProductManagementMenu(ac, update, menus.ManageProductMenu)
+	case action == "/manage_brands":
+		commands.ProductManagementMenu(ac, update, menus.ManageBrandMenu)
+	case action == "/manage_product_types":
+		commands.ProductManagementMenu(ac, update, menus.ManageProductTypeMenu)
+
+	// -------------------- Products
+	case action == "/add_product":
+	case action == "/remove_product":
+	case action == "/update_product":
 
 	// -------------------- FAQ
 	case action == "/faq":
