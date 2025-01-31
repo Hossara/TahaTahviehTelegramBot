@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
-	"taha_tahvieh_tg_bot/internal/common"
 	productDomain "taha_tahvieh_tg_bot/internal/product/domain"
 	"taha_tahvieh_tg_bot/internal/product/port"
 	"taha_tahvieh_tg_bot/pkg/adapters/database/helpers"
@@ -26,14 +25,14 @@ func NewProductMetaRepo(db *gorm.DB) port.MetaRepo {
 	return &productMetaRepo{db}
 }
 
-func (r *productMetaRepo) FindAllBrand(page int, pageSize int) (common.Pagination, error) {
+func (r *productMetaRepo) FindAllBrand(page int, pageSize int) (productDomain.BrandPagination, error) {
 	var brands []*models.Brand
 	var total int64
 
 	r.db.Model(&models.Brand{}).Count(&total)
 	offset := (page - 1) * pageSize
 
-	return common.Pagination{
+	return productDomain.BrandPagination{
 		Page:  page,
 		Pages: int((total + int64(pageSize) - 1) / int64(pageSize)),
 		Data: utils.Map(brands, func(t *models.Brand) *productDomain.Brand {
@@ -43,14 +42,14 @@ func (r *productMetaRepo) FindAllBrand(page int, pageSize int) (common.Paginatio
 }
 
 // FindAllProductType retrieves all product types
-func (r *productMetaRepo) FindAllProductType(page int, pageSize int) (common.Pagination, error) {
+func (r *productMetaRepo) FindAllProductType(page int, pageSize int) (productDomain.ProductTypePagination, error) {
 	var pts []*models.ProductType
 	var total int64
 
 	r.db.Model(&models.ProductType{}).Count(&total)
 	offset := (page - 1) * pageSize
 
-	return common.Pagination{
+	return productDomain.ProductTypePagination{
 		Page:  page,
 		Pages: int((total + int64(pageSize) - 1) / int64(pageSize)),
 		Data: utils.Map(pts, func(t *models.ProductType) *productDomain.ProductType {

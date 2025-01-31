@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
-	"taha_tahvieh_tg_bot/internal/common"
 	productDomain "taha_tahvieh_tg_bot/internal/product/domain"
 	"taha_tahvieh_tg_bot/internal/product/port"
 	"taha_tahvieh_tg_bot/internal/product_storage/domain"
@@ -26,14 +25,42 @@ func NewProductRepo(db *gorm.DB) port.Repo {
 	return &productRepo{db}
 }
 
-func (r *productRepo) FindAllByMeta(
-	brandID productDomain.BrandID, productTypeID productDomain.ProductTypeID,
-	preload bool, page int, pageSize int,
-) (common.Pagination, error) {
+func (r *productRepo) FindAllByTitle(title string, preload bool, page, pageSize int) (domain.ProductPagination, error) {
 	var products []*models.Product
 	var total int64
 
-	query := r.db.Where("brand_id = ? AND type_id = ?", brandID, productTypeID)
+	query := r.db.Where("to_tsvector('simple', title) @@ plainto_tsquery('simple', ?)", title)
+
+	if preload {
+		query = query.Preload("Brand").Preload("Type").Preload("Files")
+	}
+
+	query.Model(&models.Product{}).Count(&total)
+	offset := (page - 1) * pageSize
+
+	return domain.ProductPagination{
+		Pages: int((total + int64(pageSize) - 1) / int64(pageSize)),
+		Page:  page,
+		Data: utils.Map(products, func(t *models.Product) *domain.Product {
+			return mapper.ToDomainProduct(t)
+		}),
+	}, query.Limit(pageSize).Offset(offset).Find(&products).Error
+}
+
+func (r *productRepo) FindAllByMeta(
+	brandID productDomain.BrandID, productTypeID productDomain.ProductTypeID,
+	preload bool, page int, pageSize int,
+) (domain.ProductPagination, error) {
+	var products []*models.Product
+	var total int64
+
+	query := r.db
+
+	if brandID > 0 {
+		query = query.Where("brand_id = ?", brandID)
+	} else if productTypeID > 0 {
+		query = query.Where("type_id = ?", productTypeID)
+	}
 
 	if preload {
 		query = query.Preload("Brand").Preload("Type").Preload("Files")
@@ -45,7 +72,7 @@ func (r *productRepo) FindAllByMeta(
 	// Apply pagination
 	offset := (page - 1) * pageSize
 
-	return common.Pagination{
+	return domain.ProductPagination{
 		Page:  page,
 		Pages: int((total + int64(pageSize) - 1) / int64(pageSize)),
 		Data: utils.Map(products, func(t *models.Product) *domain.Product {
@@ -54,7 +81,7 @@ func (r *productRepo) FindAllByMeta(
 	}, query.Limit(pageSize).Offset(offset).Find(&products).Error
 }
 
-func (r *productRepo) FindAll(preload bool, page int, pageSize int) (common.Pagination, error) {
+func (r *productRepo) FindAll(preload bool, page int, pageSize int) (domain.ProductPagination, error) {
 	var products []*models.Product
 	var total int64
 	db := r.db
@@ -66,7 +93,7 @@ func (r *productRepo) FindAll(preload bool, page int, pageSize int) (common.Pagi
 	db.Model(&models.Product{}).Count(&total)
 	offset := (page - 1) * pageSize
 
-	return common.Pagination{
+	return domain.ProductPagination{
 		Page:  page,
 		Pages: int((total + int64(pageSize) - 1) / int64(pageSize)),
 		Data: utils.Map(products, func(t *models.Product) *domain.Product {
