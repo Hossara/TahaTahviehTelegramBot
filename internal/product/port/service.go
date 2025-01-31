@@ -1,18 +1,18 @@
 package port
 
 import (
-	"taha_tahvieh_tg_bot/internal/common"
 	productDomain "taha_tahvieh_tg_bot/internal/product/domain"
 	"taha_tahvieh_tg_bot/internal/product_storage/domain"
 )
 
 type Repo interface {
-	FindAll(preload bool, page, pageSize int) (common.Pagination, error)
+	FindAll(preload bool, page, pageSize int) (domain.ProductPagination, error)
+	FindAllByTitle(title string, preload bool, page, pageSize int) (domain.ProductPagination, error)
 	FindByID(id productDomain.ProductID, preload bool) (*domain.Product, error)
 	FindAllByMeta(
 		brandID productDomain.BrandID, productTypeID productDomain.ProductTypeID,
 		preload bool, page, pageSize int,
-	) (common.Pagination, error)
+	) (domain.ProductPagination, error)
 
 	UpdateByID(id productDomain.ProductID, updates map[string]interface{}) error
 
@@ -24,8 +24,8 @@ type Repo interface {
 }
 
 type MetaRepo interface {
-	FindAllBrand(page, pageSize int) (common.Pagination, error)
-	FindAllProductType(page, pageSize int) (common.Pagination, error)
+	FindAllBrand(page, pageSize int) (productDomain.BrandPagination, error)
+	FindAllProductType(page, pageSize int) (productDomain.ProductTypePagination, error)
 
 	InsertBrand(brand *productDomain.Brand) error
 	UpdateBrand(id productDomain.BrandID, updates map[string]interface{}) error
