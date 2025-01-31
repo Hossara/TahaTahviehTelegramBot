@@ -1,0 +1,69 @@
+package storage
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"taha_tahvieh_tg_bot/internal/product_storage/domain"
+	"taha_tahvieh_tg_bot/internal/storage/port"
+
+	productDomain "taha_tahvieh_tg_bot/internal/product/domain"
+)
+
+type service struct {
+	ctx        context.Context
+	repo       port.Repo
+	clientRepo port.ClientRepo
+}
+
+func NewService(ctx context.Context, repo port.Repo, clientRepo port.ClientRepo) port.Service {
+	return &service{
+		ctx:        ctx,
+		repo:       repo,
+		clientRepo: clientRepo,
+	}
+}
+
+func (r *service) InitBucket(name string) error {
+	exists, err := r.clientRepo.BucketExists(name)
+
+	if err != nil {
+		return errors.New(fmt.Sprint("Error checking bucket existence: ", err))
+	}
+
+	if !exists {
+		err := r.clientRepo.CreateBucket(name)
+
+		if err != nil {
+			return errors.New(fmt.Sprint("Error creating bucket: ", err))
+		}
+
+		return nil
+	}
+
+	return err
+}
+
+func (r *service) UploadFile(file *domain.File) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r *service) RemoveFile(filePath string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r *service) RemoveAllProductFiles(productID productDomain.ProductID) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r *service) GetProductFiles(productID productDomain.ProductID) ([]*domain.File, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r *service) RunMigrations() error {
+	return r.repo.RunMigrations()
+}
