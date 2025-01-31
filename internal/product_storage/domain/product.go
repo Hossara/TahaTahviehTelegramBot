@@ -2,6 +2,7 @@ package domain
 
 import (
 	"github.com/google/uuid"
+	"taha_tahvieh_tg_bot/internal/common"
 	productDomain "taha_tahvieh_tg_bot/internal/product/domain"
 )
 
@@ -14,3 +15,5 @@ type Product struct {
 	Description string
 	Files       []File
 }
+
+type ProductPagination common.Pagination[[]*Product]

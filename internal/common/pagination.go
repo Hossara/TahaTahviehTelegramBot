@@ -1,7 +1,7 @@
 package common
 
-type Pagination struct {
+type Pagination[T interface{}] struct {
 	Pages int
 	Page  int
-	Data  interface{}
+	Data  T
 }
