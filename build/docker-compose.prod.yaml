@@ -13,7 +13,7 @@ services:
       - taha-tahvieh-network
     build:
       context: ../
-      dockerfile: dockerfiles/prod.dockerfile
+      dockerfile: build/dockerfiles/prod.dockerfile
     volumes:
       - "../config.json:/app/bin/config.json"
     depends_on:
