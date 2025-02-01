@@ -4,7 +4,6 @@ import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
-	"strconv"
 	"taha_tahvieh_tg_bot/app"
 	"taha_tahvieh_tg_bot/internal/faq/domain"
 	"taha_tahvieh_tg_bot/pkg/bot"
@@ -20,7 +19,7 @@ func GetFaqsMenu(questions []*domain.FrequentQuestion, action string) []menus.Me
 		return menus.MenuItem{
 			Name:    t.Question,
 			IsAdmin: false,
-			Path:    fmt.Sprintf("/%s/%d", action, t.QuestionID),
+			Path:    fmt.Sprintf("/faq/%s/%d", action, t.QuestionID),
 		}
 	})
 
@@ -48,15 +47,8 @@ func FaqList(ac app.App, update tgbotapi.Update) {
 	bot.SendMessage(ac, msg)
 }
 
-func QuestionRemoveFaq(ac app.App, update tgbotapi.Update, id string) {
-	qId, err := strconv.ParseUint(id, 10, 64)
-
-	if err != nil {
-		bot.SendText(ac, update, "سوال نامعتبر است!")
-		return
-	}
-
-	question, err := ac.FaqService().GetQuestion(domain.QuestionID(qId))
+func QuestionRemoveFaq(ac app.App, update tgbotapi.Update, id uint64) {
+	question, err := ac.FaqService().GetQuestion(domain.QuestionID(id))
 
 	if err != nil {
 		bot.SendText(ac, update, "خطا هنگام دریافت اطلاعات سوال. سوال یافت نشد.")
@@ -79,7 +71,7 @@ func QuestionRemoveFaq(ac app.App, update tgbotapi.Update, id string) {
 			},
 			{
 				Name:    "حذف کردن",
-				Path:    fmt.Sprintf("/del_faq/%s", id),
+				Path:    fmt.Sprintf("/faq/remove/%d", id),
 				IsAdmin: false,
 			},
 		},
@@ -88,15 +80,8 @@ func QuestionRemoveFaq(ac app.App, update tgbotapi.Update, id string) {
 	bot.SendMessage(ac, msg)
 }
 
-func Faq(ac app.App, update tgbotapi.Update, id string) {
-	qId, err := strconv.ParseUint(id, 10, 64)
-
-	if err != nil {
-		bot.SendText(ac, update, "سوال نامعتبر است!")
-		return
-	}
-
-	question, err := ac.FaqService().GetQuestion(domain.QuestionID(qId))
+func GetFaq(ac app.App, update tgbotapi.Update, id uint64) {
+	question, err := ac.FaqService().GetQuestion(domain.QuestionID(id))
 
 	if err != nil {
 		bot.SendText(ac, update, "خطا هنگام دریافت اطلاعات سوال. سوال یافت نشد.")
@@ -129,26 +114,14 @@ func Faq(ac app.App, update tgbotapi.Update, id string) {
 }
 
 func FaqMenu(ac app.App, update tgbotapi.Update) {
-	isSuper := bot.IsSuperRole(update, ac)
-
-	if !isSuper {
-		return
-	}
-
 	msg := tgbotapi.NewMessage(update.FromChat().ID, "منو سوالات پرتکرار خدمت شما")
 
-	msg.ReplyMarkup = keyboards.InlineKeyboard(menus.FaqMenu, isSuper)
+	msg.ReplyMarkup = keyboards.InlineKeyboard(menus.FaqMenu, true)
 
 	bot.SendMessage(ac, msg)
 }
 
 func RemoveFaqMenu(ac app.App, update tgbotapi.Update) {
-	isSuper := bot.IsSuperRole(update, ac)
-
-	if !isSuper {
-		return
-	}
-
 	questions, err := ac.FaqService().GetAllQuestions()
 
 	if err != nil {
@@ -158,18 +131,12 @@ func RemoveFaqMenu(ac app.App, update tgbotapi.Update) {
 
 	msg := tgbotapi.NewMessage(update.FromChat().ID, "برای حذف هر سوال بر روی نام آن کلیک کنید")
 
-	msg.ReplyMarkup = keyboards.InlineKeyboardColumn(GetFaqsMenu(questions, "q_r_faq"), false)
+	msg.ReplyMarkup = keyboards.InlineKeyboardColumn(GetFaqsMenu(questions, "remove_confirm"), false)
 
 	bot.SendMessage(ac, msg)
 }
 
-func UpdateFaq(ac app.App, update tgbotapi.Update) {
-	isSuper := bot.IsSuperRole(update, ac)
-
-	if !isSuper {
-		return
-	}
-
+func UpdateFaqMenu(ac app.App, update tgbotapi.Update) {
 	questions, err := ac.FaqService().GetAllQuestions()
 
 	if err != nil {
@@ -184,23 +151,10 @@ func UpdateFaq(ac app.App, update tgbotapi.Update) {
 	bot.SendMessage(ac, msg)
 }
 
-func RemoveFaq(ac app.App, update tgbotapi.Update, id string) {
-	isSuper := bot.IsSuperRole(update, ac)
-
-	if !isSuper {
-		return
-	}
-
-	qId, err := strconv.ParseUint(id, 10, 64)
-
-	if err != nil {
-		bot.SendText(ac, update, "سوال نامعتبر است!")
-		return
-	}
-
+func RemoveFaq(ac app.App, update tgbotapi.Update, id uint64) {
 	bot.SendText(ac, update, "در حال حذف سوال...")
 
-	err = ac.FaqService().DeleteQuestion(domain.QuestionID(qId))
+	err := ac.FaqService().DeleteQuestion(domain.QuestionID(id))
 
 	if err != nil {
 		log.Printf("%v\n", err)

@@ -12,10 +12,6 @@ import (
 )
 
 func UpdateFaq(update tgbotapi.Update, ac app.App, state *app.UserState) {
-	if !bot.IsSuperRole(update, ac) {
-		return
-	}
-
 	switch state.Step {
 	case 0:
 		state.Active = true

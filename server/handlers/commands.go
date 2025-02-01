@@ -63,7 +63,7 @@ func HandleCommands(update tgbotapi.Update, ac app.App) {
 		commands.RemoveFaqMenu(ac, update)
 
 	case "update_faq":
-		commands.UpdateFaq(ac, update)
+		commands.UpdateFaqMenu(ac, update)
 
 	// -------------------- General Conversations
 	case "edit_about":
