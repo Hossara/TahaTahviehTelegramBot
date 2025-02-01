@@ -1,11 +1,12 @@
 package handlers
 
 import (
+	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"slices"
-	"strings"
+	"strconv"
 	"taha_tahvieh_tg_bot/app"
 	"taha_tahvieh_tg_bot/pkg/bot"
+	router "taha_tahvieh_tg_bot/pkg/router"
 	"taha_tahvieh_tg_bot/server/commands"
 	"taha_tahvieh_tg_bot/server/conversations"
 	"taha_tahvieh_tg_bot/server/menus"
@@ -13,92 +14,232 @@ import (
 
 func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 	action := update.CallbackQuery.Data
-	//chatID := update.CallbackQuery.Message.Chat.ID
+	r := router.NewRouter()
 
-	switch {
 	// -------------------- General
-	case action == "/about":
-		commands.About(ac, update)
+	r.Handle("/about/{action}", func(vars router.PathVars, queries router.UrlQueries) {
+		switch vars["action"] {
+		case "get":
+			commands.About(ac, update)
+		case "update":
+			if !bot.IsSuperRole(update, ac) {
+				return
+			}
 
-	case action == "/menu":
+			state := bot.ResetUserState(update, ac)
+			conversations.UpdateAbout(update, ac, state)
+		}
+	})
+
+	r.Handle("/menu", func(vars router.PathVars, queries router.UrlQueries) {
 		commands.Menu(ac, update)
+	})
 
-	case action == "/support":
+	r.Handle("/support", func(vars router.PathVars, queries router.UrlQueries) {
 		commands.Support(ac, update)
+	})
 
-	case action == "/help":
-		commands.Help(ac, update)
+	r.Handle("/help/{action}", func(vars router.PathVars, queries router.UrlQueries) {
+		switch vars["action"] {
+		case "get":
+			commands.Help(ac, update)
+		case "update":
+			if !bot.IsSuperRole(update, ac) {
+				return
+			}
+
+			state := bot.ResetUserState(update, ac)
+			conversations.UpdateHelp(update, ac, state)
+		}
+	})
 
 	// -------------------- Search
-	case action == "/search":
+	r.Handle("/search", func(vars router.PathVars, queries router.UrlQueries) {
 		commands.SearchProductMenu(ac, update)
+	})
 
-	case action == "/search_title":
-	case action == "/search_brand":
-		commands.SelectProductMenu(ac, update, "brand", "محصولات هر برند")
-	case action == "/search_type":
-		commands.SelectProductMenu(ac, update, "type", "محصولات هر دسته‌بندی")
+	r.Handle("/search/{query}", func(vars router.PathVars, queries router.UrlQueries) {
+		pageQ, pageOk := queries["page"]
+
+		page, pageErr := strconv.Atoi(pageQ)
+		msID := update.CallbackQuery.Message.MessageID
+
+		if !pageOk || pageErr != nil {
+			bot.SendText(ac, update, "صفحه نامعتبر است.")
+			return
+		}
+
+		switch vars["query"] {
+		case "title":
+		case "type":
+			commands.SelectProductMenu(
+				ac, update, "search", "type",
+				"جهت دیدن محصولات هر دسته‌بندی بر روی عنوان آن کلیک کنید",
+				page, msID, map[string]string{
+					"brand": queries["brand"],
+				},
+			)
+		case "brand":
+			commands.SelectProductMenu(
+				ac, update, "search", "brand",
+				"برند مورد نظر خود را انتخاب کنید",
+				page, msID, map[string]string{},
+			)
+		}
+	})
 
 	// -------------------- Product Management
-	case action == "/manage_product":
-		commands.ProductManagementMenu(ac, update, menus.ManageProductMenu)
-	case action == "/manage_brands":
-		commands.ProductManagementMenu(ac, update, menus.ManageBrandMenu)
-	case action == "/manage_product_types":
-		commands.ProductManagementMenu(ac, update, menus.ManageProductTypeMenu)
+	r.Handle("/manage/{query}", func(vars router.PathVars, queries router.UrlQueries) {
+		if !bot.IsSuperRole(update, ac) {
+			return
+		}
+
+		switch vars["query"] {
+		case "product":
+			commands.ProductManagementMenu(ac, update, menus.ManageProductMenu)
+		case "brands":
+			commands.ProductManagementMenu(ac, update, menus.ManageBrandMenu)
+		case "product_types":
+			commands.ProductManagementMenu(ac, update, menus.ManageProductTypeMenu)
+		}
+	})
 
 	// -------------------- Products
-	case action == "/add_product":
-	case action == "/remove_product":
-	case action == "/update_product":
+	r.Handle("/product/menu/{entity}/{action}", func(vars router.PathVars, queries router.UrlQueries) {
+		if !bot.IsSuperRole(update, ac) {
+			return
+		}
+
+		if vars["action"] == "add" {
+			state := bot.ResetUserState(update, ac)
+
+			switch vars["entity"] {
+			case "product":
+				conversations.AddProduct(update, ac, state)
+			case "brand":
+				conversations.AddBrand(update, ac, state)
+			case "type":
+				conversations.AddProductType(update, ac, state)
+			}
+			return
+		}
+
+		pageQ, pageOk := queries["page"]
+
+		page, pageErr := strconv.Atoi(pageQ)
+
+		if !pageOk || pageErr != nil {
+			bot.SendText(ac, update, "صفحه نامعتبر است.")
+			return
+		}
+
+		actionText := map[string]string{
+			"remove": "حذف", "update": "ویرایش",
+		}
+
+		categoryText := map[string]string{
+			"product": "محصول", "brand": "برند",
+			"type": "دسته‌بندی محصول",
+		}
+
+		commands.SelectProductMenu(
+			ac, update, vars["action"], vars["entity"],
+			fmt.Sprintf(
+				"جهت %s هر %s، بر روی نام آن کلیک کنید.",
+				actionText[vars["action"]], categoryText["entity"],
+			),
+			page, update.CallbackQuery.Message.MessageID,
+			map[string]string{},
+		)
+	})
+
+	r.Handle("/product/action/{action}/{product}", func(vars router.PathVars, queries router.UrlQueries) {
+		id, err := strconv.ParseUint(vars["product"], 10, 64)
+
+		if err != nil || id == 0 {
+			bot.SendText(ac, update, "محصول نامعتبر است!")
+			return
+		}
+
+		switch vars["action"] {
+		// See product
+		case "get":
+
+		case "add":
+			if !bot.IsSuperRole(update, ac) {
+				return
+			}
+		case "remove":
+			if !bot.IsSuperRole(update, ac) {
+				return
+			}
+		case "update":
+			if !bot.IsSuperRole(update, ac) {
+				return
+			}
+		}
+	})
 
 	// -------------------- FAQ
-	case action == "/faq":
+	r.Handle("/faq", func(vars router.PathVars, queries router.UrlQueries) {
 		commands.FaqList(ac, update)
+	})
 
-	case action == "/faq_menu":
-		commands.FaqMenu(ac, update)
+	r.Handle("/faq/add", func(vars router.PathVars, queries router.UrlQueries) {
+		if !bot.IsSuperRole(update, ac) {
+			return
+		}
 
-	case action == "/add_faq":
 		state := bot.ResetUserState(update, ac)
 		conversations.AddFaq(update, ac, state)
+	})
 
-	case action == "/remove_faq":
-		commands.RemoveFaqMenu(ac, update)
+	r.Handle("/faq/menu/{action}", func(vars router.PathVars, queries router.UrlQueries) {
+		if !bot.IsSuperRole(update, ac) {
+			return
+		}
 
-	case action == "/update_faq":
-		commands.UpdateFaq(ac, update)
+		switch vars["action"] {
+		case "":
+			commands.FaqMenu(ac, update)
+		case "update":
+			commands.UpdateFaqMenu(ac, update)
+		case "remove":
+			commands.RemoveFaqMenu(ac, update)
+		}
+	})
 
-	// -------------------- General Conversations
-	case action == "/edit_about":
-		state := bot.ResetUserState(update, ac)
-		conversations.UpdateAbout(update, ac, state)
+	r.Handle("/faq/{action}/{question}", func(vars router.PathVars, queries router.UrlQueries) {
+		id, err := strconv.ParseUint(vars["question"], 10, 64)
 
-	case action == "/edit_help":
-		state := bot.ResetUserState(update, ac)
-		conversations.UpdateHelp(update, ac, state)
-	}
+		if err != nil {
+			bot.SendText(ac, update, "سوال نامعتبر است!")
+			return
+		}
 
-	// Check Path Variables
-	actionPath := strings.Split(action, "/")
+		switch vars["action"] {
+		case "get":
+			commands.GetFaq(ac, update, id)
+		case "update":
+			if !bot.IsSuperRole(update, ac) {
+				return
+			}
+			state := bot.ResetUserState(update, ac)
+			state.Data["id"] = strconv.FormatUint(id, 10)
+			conversations.UpdateFaq(update, ac, state)
+		case "remove":
+			if !bot.IsSuperRole(update, ac) {
+				return
+			}
+			commands.RemoveFaq(ac, update, id)
+		case "remove_confirm":
+			if !bot.IsSuperRole(update, ac) {
+				return
+			}
+			commands.QuestionRemoveFaq(ac, update, id)
+		}
+	})
 
-	switch {
-	// Get Exact FAQ
-	case slices.Contains(actionPath, "get_faq") && actionPath[2] != "":
-		commands.Faq(ac, update, actionPath[2])
-
-	// Delete Exact FAQ Confirmations Question
-	case slices.Contains(actionPath, "q_r_faq") && actionPath[2] != "":
-		commands.QuestionRemoveFaq(ac, update, actionPath[2])
-
-	// Delete Exact FAQ
-	case slices.Contains(actionPath, "del_faq") && actionPath[2] != "":
-		commands.RemoveFaq(ac, update, actionPath[2])
-
-	// Update Exact FAQ
-	case slices.Contains(actionPath, "update_faq") && len(actionPath) > 2 && actionPath[2] != "":
-		state := bot.ResetUserState(update, ac)
-		state.Data["id"] = actionPath[2]
-		conversations.UpdateFaq(update, ac, state)
-	}
+	// Parse & Call
+	r.Parse(action)
 }
