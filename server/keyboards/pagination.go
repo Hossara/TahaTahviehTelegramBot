@@ -3,23 +3,39 @@ package keyboards
 import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"strconv"
+	"taha_tahvieh_tg_bot/pkg/router"
 	"taha_tahvieh_tg_bot/server/menus"
 )
 
-func getPaginationRow(currentPage, totalPages int) []tgbotapi.InlineKeyboardButton {
+func getPaginationRow(currentPage, totalPages int, url, key string) []tgbotapi.InlineKeyboardButton {
 	var paginationRow []tgbotapi.InlineKeyboardButton
 
 	if totalPages > 1 {
 		if currentPage > 1 {
-			paginationRow = append(paginationRow, tgbotapi.NewInlineKeyboardButtonData("<<", "page:1"))                             // First
-			paginationRow = append(paginationRow, tgbotapi.NewInlineKeyboardButtonData("<", fmt.Sprintf("page:%d", currentPage-1))) // Previous
+			prev, err := router.ReplaceQueryParam(url, key, strconv.Itoa(currentPage-1))
+			first, err := router.ReplaceQueryParam(url, key, strconv.Itoa(totalPages))
+
+			if err != nil {
+				return nil
+			}
+
+			paginationRow = append(paginationRow, tgbotapi.NewInlineKeyboardButtonData("<<", first)) // First
+			paginationRow = append(paginationRow, tgbotapi.NewInlineKeyboardButtonData("<", prev))   // Previous
 		}
 
 		paginationRow = append(paginationRow, tgbotapi.NewInlineKeyboardButtonData(fmt.Sprintf("%d / %d", currentPage, totalPages), "page:current"))
 
 		if currentPage < totalPages {
-			paginationRow = append(paginationRow, tgbotapi.NewInlineKeyboardButtonData(">", fmt.Sprintf("page:%d", currentPage+1))) // Next
-			paginationRow = append(paginationRow, tgbotapi.NewInlineKeyboardButtonData(">>", fmt.Sprintf("page:%d", totalPages)))   // Last
+			next, err := router.ReplaceQueryParam(url, key, strconv.Itoa(currentPage+1))
+			last, err := router.ReplaceQueryParam(url, key, strconv.Itoa(totalPages))
+
+			if err != nil {
+				return nil
+			}
+
+			paginationRow = append(paginationRow, tgbotapi.NewInlineKeyboardButtonData(">", next))  // Next
+			paginationRow = append(paginationRow, tgbotapi.NewInlineKeyboardButtonData(">>", last)) // Last
 		}
 	}
 
