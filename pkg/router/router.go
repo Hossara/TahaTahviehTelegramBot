@@ -1,4 +1,4 @@
-package handlers
+package router
 
 import (
 	"fmt"
@@ -70,4 +70,27 @@ func parseQueryParams(query string) map[string]string {
 		params[key] = values[0]
 	}
 	return params
+}
+
+// ReplaceQueryParam replaces (or adds) the specified query parameter in the given URL string.
+// For example, given input "/search/type?page=1&brand=1", key "brand" and newValue "2",
+// it will return "/search/type?page=1&brand=2".
+func ReplaceQueryParam(input, key, newValue string) (string, error) {
+	// Parse the input URL string.
+	parsedURL, err := url.Parse(input)
+	if err != nil {
+		return "", err
+	}
+
+	// Get the existing query parameters.
+	q := parsedURL.Query()
+
+	// Replace the value for the given key.
+	q.Set(key, newValue)
+
+	// Update the RawQuery field with the encoded query parameters.
+	parsedURL.RawQuery = q.Encode()
+
+	// Return the updated URL string.
+	return parsedURL.String(), nil
 }
