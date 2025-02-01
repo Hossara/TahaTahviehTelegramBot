@@ -92,13 +92,31 @@ func (r *service) GetProduct(id productDomain.ProductID) (*domain.Product, error
 }
 
 func (r *service) CreateBrand(brand *productDomain.Brand) error {
-	//TODO implement me
-	panic("implement me")
+	if brand == nil {
+		return errors.New("brand cannot be empty")
+	}
+
+	err := r.metaRepo.InsertBrand(brand)
+
+	if err != nil {
+		return fmt.Errorf("error inserting brand: %w", err)
+	}
+
+	return nil
 }
 
-func (r *service) CreateProductType(productType productDomain.ProductType) error {
-	//TODO implement me
-	panic("implement me")
+func (r *service) CreateProductType(productType *productDomain.ProductType) error {
+	if productType == nil {
+		return errors.New("product type cannot be empty")
+	}
+
+	err := r.metaRepo.InsertProductType(productType)
+
+	if err != nil {
+		return fmt.Errorf("error inserting product type: %w", err)
+	}
+
+	return nil
 }
 
 func (r *service) DeleteProductType(id productDomain.ProductTypeID) error {
