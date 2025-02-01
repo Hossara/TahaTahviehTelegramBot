@@ -6,22 +6,21 @@ import (
 	"taha_tahvieh_tg_bot/server/conversations"
 )
 
+var gaps = map[string]func(update tgbotapi.Update, ac app.App, state *app.UserState){
+	"add_product":      conversations.AddProduct,
+	"add_brand":        conversations.AddBrand,
+	"add_product_type": conversations.AddProductType,
+
+	"update_about": conversations.UpdateAbout,
+	"update_help":  conversations.UpdateHelp,
+	"add_faq":      conversations.AddFaq,
+	"update_faq":   conversations.UpdateFaq,
+}
+
 func HandleConversations(update tgbotapi.Update, ac app.App) {
 	userState := ac.AppState(update.SentFrom().ID)
 
 	if userState.Active {
-		switch userState.Conversation {
-		case "update_about":
-			conversations.UpdateAbout(update, ac, userState)
-
-		case "update_help":
-			conversations.UpdateHelp(update, ac, userState)
-
-		case "add_faq":
-			conversations.AddFaq(update, ac, userState)
-
-		case "update_faq":
-			conversations.UpdateFaq(update, ac, userState)
-		}
+		gaps[userState.Conversation](update, ac, userState)
 	}
 }
