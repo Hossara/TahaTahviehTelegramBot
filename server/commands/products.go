@@ -3,20 +3,18 @@ package commands
 import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"log"
+	"strconv"
 	"taha_tahvieh_tg_bot/app"
+	productDomain "taha_tahvieh_tg_bot/internal/product/domain"
 	"taha_tahvieh_tg_bot/pkg/bot"
+	"taha_tahvieh_tg_bot/pkg/utils"
 	"taha_tahvieh_tg_bot/server/constants"
 	"taha_tahvieh_tg_bot/server/keyboards"
 	"taha_tahvieh_tg_bot/server/menus"
 )
 
 func ProductManagementMenu(ac app.App, update tgbotapi.Update, menu [][]menus.MenuItem) {
-	isSuper := bot.IsSuperRole(update, ac)
-
-	if !isSuper {
-		return
-	}
-
 	msg := tgbotapi.NewMessage(update.FromChat().ID, constants.MenuResponse)
 
 	msg.ReplyMarkup = keyboards.InlineKeyboard(menu, true)
@@ -32,32 +30,74 @@ func SearchProductMenu(ac app.App, update tgbotapi.Update) {
 	bot.SendMessage(ac, msg)
 }
 
-func SelectProductMenu(ac app.App, update tgbotapi.Update, menu, title string) {
-	msg := tgbotapi.NewMessage(update.FromChat().ID, fmt.Sprintf("جهت دیدن %s بر روی عنوان آن کلیک کنید", title))
+func SelectProductMenu(ac app.App, update tgbotapi.Update, action, menu, text string, page, prev int, meta map[string]string) {
+	send := func(keyboard tgbotapi.InlineKeyboardMarkup) {
+		msg := tgbotapi.NewMessage(update.FromChat().ID, text)
 
-	/*var menuItems []menus.MenuItem
-	//products, err := ac.ProductService()
+		if page > 1 {
+			bot.SendMessage(ac, tgbotapi.NewEditMessageReplyMarkup(update.FromChat().ID, prev, keyboard))
+			return
+		}
+
+		msg.ReplyMarkup = keyboard
+		bot.SendMessage(ac, msg)
+	}
+
+	addMain := func(menu []menus.MenuItem) []menus.MenuItem {
+		return append(menu, menus.MenuItem{Name: "منو اصلی", IsAdmin: false, Path: "/menu"})
+	}
+
+	var menuItems []menus.MenuItem
+	var keyboard tgbotapi.InlineKeyboardMarkup
 
 	switch menu {
 	case "brand":
-		brands, err := ac.ProductService().GetAllBrands()
+		brands, err := ac.ProductService().GetAllBrands(page, 10)
 
-		menuItems = utils.Map(items, func(t *T) menus.MenuItem {
+		if err != nil {
+			log.Println(err)
+			bot.SendText(ac, update, "خطا هنگام دریافت برند ها!")
+			return
+		}
+
+		menuItems = utils.Map(brands.Data, func(t *productDomain.Brand) menus.MenuItem {
 			return menus.MenuItem{
-				Name:    t.Title,
-				IsAdmin: false,
-				Path:    fmt.Sprintf("/%s/%d", action, t.ID),
+				Name: t.Title, IsAdmin: false,
+				Path: fmt.Sprintf("/search/type?page=1&brand=%d", t.ID),
 			}
 		})
+
+		keyboard = keyboards.InlinePaginationColumnKeyboard(
+			addMain(menuItems), false,
+			page, brands.Pages, fmt.Sprintf("/search/brand?page=%d", page), "page")
 	case "type":
+		brandID, err := strconv.Atoi(meta["brand"])
 
-	}*/
+		if err != nil {
+			log.Println(err)
+			bot.SendText(ac, update, "برند نامعتبر!")
+			return
+		}
 
-	/*
+		types, err := ac.ProductService().GetAllProductTypes(page, 10)
 
-		menu = append(menu, menus.MenuItem{Name: "منو اصلی", IsAdmin: false, Path: "/menu"})*/
+		if err != nil {
+			log.Println(err)
+			bot.SendText(ac, update, "خطا هنگام دریافت دسته‌بندی ها!")
+			return
+		}
 
-	//msg.ReplyMarkup = keyboards.InlineKeyboardColumn(GetProductMenu(questions, action), false)
+		menuItems = utils.Map(types.Data, func(t *productDomain.ProductType) menus.MenuItem {
+			return menus.MenuItem{
+				Name: t.Title, IsAdmin: false,
+				Path: fmt.Sprintf("/search/product?page=1&brand=%d&type=%d", brandID, t.ID),
+			}
+		})
 
-	bot.SendMessage(ac, msg)
+		keyboard = keyboards.InlinePaginationColumnKeyboard(
+			addMain(menuItems), false,
+			page, types.Pages, fmt.Sprintf("/search/type?page=%d&brand=%d", page, brandID), "page")
+	}
+
+	send(keyboard)
 }
