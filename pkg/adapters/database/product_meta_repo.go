@@ -32,13 +32,15 @@ func (r *productMetaRepo) FindAllBrand(page int, pageSize int) (productDomain.Br
 	r.db.Model(&models.Brand{}).Count(&total)
 	offset := (page - 1) * pageSize
 
+	err := r.db.Limit(pageSize).Offset(offset).Find(&brands).Error
+
 	return productDomain.BrandPagination{
 		Page:  page,
 		Pages: int((total + int64(pageSize) - 1) / int64(pageSize)),
 		Data: utils.Map(brands, func(t *models.Brand) *productDomain.Brand {
 			return mapper.ToDomainBrand(t)
 		}),
-	}, r.db.Limit(pageSize).Offset(offset).Find(&brands).Error
+	}, err
 }
 
 // FindAllProductType retrieves all product types
@@ -49,13 +51,15 @@ func (r *productMetaRepo) FindAllProductType(page int, pageSize int) (productDom
 	r.db.Model(&models.ProductType{}).Count(&total)
 	offset := (page - 1) * pageSize
 
+	err := r.db.Limit(pageSize).Offset(offset).Find(&pts).Error
+
 	return productDomain.ProductTypePagination{
 		Page:  page,
 		Pages: int((total + int64(pageSize) - 1) / int64(pageSize)),
 		Data: utils.Map(pts, func(t *models.ProductType) *productDomain.ProductType {
 			return mapper.ToDomainProductType(t)
 		}),
-	}, r.db.Limit(pageSize).Offset(offset).Find(&pts).Error
+	}, err
 }
 
 // InsertBrand inserts a new brand

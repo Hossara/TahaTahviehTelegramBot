@@ -38,13 +38,15 @@ func (r *productRepo) FindAllByTitle(title string, preload bool, page, pageSize 
 	query.Model(&models.Product{}).Count(&total)
 	offset := (page - 1) * pageSize
 
+	err := query.Limit(pageSize).Offset(offset).Find(&products).Error
+
 	return domain.ProductPagination{
 		Pages: int((total + int64(pageSize) - 1) / int64(pageSize)),
 		Page:  page,
 		Data: utils.Map(products, func(t *models.Product) *domain.Product {
 			return mapper.ToDomainProduct(t)
 		}),
-	}, query.Limit(pageSize).Offset(offset).Find(&products).Error
+	}, err
 }
 
 func (r *productRepo) FindAllByMeta(
@@ -72,13 +74,15 @@ func (r *productRepo) FindAllByMeta(
 	// Apply pagination
 	offset := (page - 1) * pageSize
 
+	err := query.Limit(pageSize).Offset(offset).Find(&products).Error
+
 	return domain.ProductPagination{
 		Page:  page,
 		Pages: int((total + int64(pageSize) - 1) / int64(pageSize)),
 		Data: utils.Map(products, func(t *models.Product) *domain.Product {
 			return mapper.ToDomainProduct(t)
 		}),
-	}, query.Limit(pageSize).Offset(offset).Find(&products).Error
+	}, err
 }
 
 func (r *productRepo) FindAll(preload bool, page int, pageSize int) (domain.ProductPagination, error) {
@@ -93,13 +97,15 @@ func (r *productRepo) FindAll(preload bool, page int, pageSize int) (domain.Prod
 	db.Model(&models.Product{}).Count(&total)
 	offset := (page - 1) * pageSize
 
+	err := db.Limit(pageSize).Offset(offset).Find(&products).Error
+
 	return domain.ProductPagination{
 		Page:  page,
 		Pages: int((total + int64(pageSize) - 1) / int64(pageSize)),
 		Data: utils.Map(products, func(t *models.Product) *domain.Product {
 			return mapper.ToDomainProduct(t)
 		}),
-	}, db.Limit(pageSize).Offset(offset).Find(&products).Error
+	}, err
 }
 
 // FindByID retrieves a product by ID
