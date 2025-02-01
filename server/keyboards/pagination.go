@@ -14,7 +14,7 @@ func getPaginationRow(currentPage, totalPages int, url, key string) []tgbotapi.I
 	if totalPages > 1 {
 		if currentPage > 1 {
 			prev, err := router.ReplaceQueryParam(url, key, strconv.Itoa(currentPage-1))
-			first, err := router.ReplaceQueryParam(url, key, strconv.Itoa(totalPages))
+			first, err := router.ReplaceQueryParam(url, key, strconv.Itoa(1))
 
 			if err != nil {
 				return nil
