@@ -42,7 +42,10 @@ func getPaginationRow(currentPage, totalPages int, url, key string) []tgbotapi.I
 	return paginationRow
 }
 
-func InlinePaginationColumnKeyboard(menu []menus.MenuItem, isAdmin bool, currentPage, totalPages int) tgbotapi.InlineKeyboardMarkup {
+func InlinePaginationColumnKeyboard(
+	menu []menus.MenuItem, isAdmin bool, currentPage,
+	totalPages int, url, key string,
+) tgbotapi.InlineKeyboardMarkup {
 	var keyboard [][]tgbotapi.InlineKeyboardButton
 
 	for _, item := range menu {
@@ -55,12 +58,19 @@ func InlinePaginationColumnKeyboard(menu []menus.MenuItem, isAdmin bool, current
 		})
 	}
 
-	keyboard = append(keyboard, getPaginationRow(currentPage, totalPages))
+	pg := getPaginationRow(currentPage, totalPages, url, key)
+
+	if len(pg) > 0 {
+		keyboard = append(keyboard, pg)
+	}
 
 	return tgbotapi.NewInlineKeyboardMarkup(keyboard...)
 }
 
-func InlinePaginationKeyboard(menu [][]menus.MenuItem, isAdmin bool, currentPage, totalPages int) tgbotapi.InlineKeyboardMarkup {
+func InlinePaginationKeyboard(
+	menu [][]menus.MenuItem, isAdmin bool, currentPage,
+	totalPages int, url, key string,
+) tgbotapi.InlineKeyboardMarkup {
 	var keyboardRows [][]tgbotapi.InlineKeyboardButton
 
 	for _, items := range menu {
@@ -79,8 +89,11 @@ func InlinePaginationKeyboard(menu [][]menus.MenuItem, isAdmin bool, currentPage
 		}
 	}
 
-	keyboardRows = append(keyboardRows, getPaginationRow(currentPage, totalPages))
+	pg := getPaginationRow(currentPage, totalPages, url, key)
 
-	// Return the complete keyboard markup
+	if len(pg) > 0 {
+		keyboardRows = append(keyboardRows, pg)
+	}
+
 	return tgbotapi.NewInlineKeyboardMarkup(keyboardRows...)
 }
