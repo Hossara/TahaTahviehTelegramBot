@@ -1,49 +1,46 @@
 package menus
 
-var ManageProductMenu = [][]MenuItem{
+var SearchProductMenu = [][]MenuItem{
 	{
-		{Path: "/add_product", IsAdmin: true, Name: "افزودن محصول"},
+		{Path: "/search/title?page=1", IsAdmin: true, Name: "براساس نام محصول"},
 	},
 	{
-		{Path: "/remove_product", IsAdmin: true, Name: "حذف محصول"},
-	},
-	{
-		{Path: "/update_product", IsAdmin: true, Name: "ویرایش محصول"},
+		{Path: "/search/brand?page=1", IsAdmin: true, Name: "براساس برند و دسته‌بندی"},
 	},
 }
 
-var SearchProductMenu = [][]MenuItem{
+var ManageProductMenu = [][]MenuItem{
 	{
-		{Path: "/search_title", IsAdmin: true, Name: "براساس نام محصول"},
+		{Path: "/product/menu/product/add", IsAdmin: true, Name: "افزودن محصول"},
 	},
 	{
-		{Path: "/search_brand", IsAdmin: true, Name: "براساس نام برند"},
+		{Path: "/product/menu/product/remove?page=1", IsAdmin: true, Name: "حذف محصول"},
 	},
 	{
-		{Path: "/search_type", IsAdmin: true, Name: "براساس نوع محصول"},
+		{Path: "/product/menu/product/update?page=1", IsAdmin: true, Name: "ویرایش محصول"},
 	},
 }
 
 var ManageProductTypeMenu = [][]MenuItem{
 	{
-		{Path: "/add_product_type", IsAdmin: true, Name: "افزودن دسته‌بندی محصول"},
+		{Path: "/product/menu/type/add", IsAdmin: true, Name: "افزودن دسته‌بندی محصول"},
 	},
 	{
-		{Path: "/remove_product_type", IsAdmin: true, Name: "حذف دسته‌بندی محصول"},
+		{Path: "/product/menu/type/remove?page=1", IsAdmin: true, Name: "حذف دسته‌بندی محصول"},
 	},
 	{
-		{Path: "/update_product_type", IsAdmin: true, Name: "ویرایش دسته‌بندی محصول"},
+		{Path: "/product/menu/type/update?page=1", IsAdmin: true, Name: "ویرایش دسته‌بندی محصول"},
 	},
 }
 
 var ManageBrandMenu = [][]MenuItem{
 	{
-		{Path: "/add_brand", IsAdmin: true, Name: "افزودن برند محصول"},
+		{Path: "/product/menu/brand/add", IsAdmin: true, Name: "افزودن برند محصول"},
 	},
 	{
-		{Path: "/remove_brand", IsAdmin: true, Name: "حذف برند محصول"},
+		{Path: "/product/menu/brand/remove?page=1", IsAdmin: true, Name: "حذف برند محصول"},
 	},
 	{
-		{Path: "/update_brand", IsAdmin: true, Name: "ویرایش برند محصول"},
+		{Path: "/product/menu/brand/update?page=1", IsAdmin: true, Name: "ویرایش برند محصول"},
 	},
 }
