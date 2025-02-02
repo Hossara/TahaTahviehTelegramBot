@@ -3,6 +3,8 @@ x-taha-tahvieh: &taha-tahvieh
   command: server --console-address ":9090" http://ttminiosv1/data{1...2}
   env_file: minio/.env
   restart: unless-stopped
+  ports:
+    - "9090:9090"
   networks: 
     - taha-tahvieh-network
   healthcheck:
