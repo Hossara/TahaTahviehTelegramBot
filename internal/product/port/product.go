@@ -18,6 +18,7 @@ type Service interface {
 
 	GetProduct(id productDomain.ProductID) (*domain.Product, error)
 
+	CreateProduct(product *domain.Product) (productDomain.ProductID, error)
 	CreateBrand(brand *productDomain.Brand) error
 	CreateProductType(productType *productDomain.ProductType) error
 

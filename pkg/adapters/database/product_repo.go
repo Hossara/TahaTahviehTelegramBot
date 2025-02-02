@@ -135,10 +135,10 @@ func (r *productRepo) UpdateByID(id productDomain.ProductID, updates map[string]
 }
 
 // Insert inserts a new product
-func (r *productRepo) Insert(product *domain.Product) error {
+func (r *productRepo) Insert(product *domain.Product) (productDomain.ProductID, error) {
 	modelProduct := mapper.ToModelProduct(product)
 
-	return r.db.Create(modelProduct).Error
+	return productDomain.ProductID(modelProduct.ID), r.db.Create(modelProduct).Error
 }
 
 // DeleteById deletes a product by ID

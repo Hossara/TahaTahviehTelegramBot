@@ -16,7 +16,7 @@ type Repo interface {
 
 	UpdateByID(id productDomain.ProductID, updates map[string]interface{}) error
 
-	Insert(product *domain.Product) error
+	Insert(product *domain.Product) (productDomain.ProductID, error)
 
 	DeleteById(id productDomain.ProductID) error
 
