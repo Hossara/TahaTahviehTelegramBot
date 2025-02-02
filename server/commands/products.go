@@ -60,10 +60,15 @@ func SelectProductMenu(ac app.App, update tgbotapi.Update, action, menu, text st
 			return
 		}
 
+		act := map[string]string{
+			"search":      "/search/type",
+			"add_product": "/product/product/add",
+		}
+
 		menuItems = utils.Map(brands.Data, func(t *productDomain.Brand) menus.MenuItem {
 			return menus.MenuItem{
 				Name: t.Title, IsAdmin: false,
-				Path: fmt.Sprintf("/search/type?page=1&brand=%d", t.ID),
+				Path: fmt.Sprintf("%s?page=1&brand=%d", act[action], t.ID),
 			}
 		})
 
@@ -87,10 +92,15 @@ func SelectProductMenu(ac app.App, update tgbotapi.Update, action, menu, text st
 			return
 		}
 
+		act := map[string]string{
+			"search":      "/search/product",
+			"add_product": "/product/product/add",
+		}
+
 		menuItems = utils.Map(types.Data, func(t *productDomain.ProductType) menus.MenuItem {
 			return menus.MenuItem{
 				Name: t.Title, IsAdmin: false,
-				Path: fmt.Sprintf("/search/product?page=1&brand=%d&type=%d", brandID, t.ID),
+				Path: fmt.Sprintf("%s?page=1&brand=%d&type=%d", act[action], brandID, t.ID),
 			}
 		})
 
