@@ -191,13 +191,15 @@ func GetProduct(ac app.App, update tgbotapi.Update, id int64) {
 		product.Description,
 	))
 
+	isAdmin := bot.IsSuperRole(update, ac)
+
 	msg.ReplyMarkup = keyboards.InlineKeyboardColumn([]menus.MenuItem{
-		{Path: fmt.Sprintf("/product/product/update?pid=%d", id), Name: "ویرایش محصول", IsAdmin: false},
-		{Path: fmt.Sprintf("/product/product/remove?pid=%d", id), Name: "حذف محصول", IsAdmin: false},
+		{Path: fmt.Sprintf("/product/product/update?pid=%d", id), Name: "ویرایش محصول", IsAdmin: true},
+		{Path: fmt.Sprintf("/product/product/remove?pid=%d", id), Name: "حذف محصول", IsAdmin: true},
 		{Path: fmt.Sprintf("/product/product/files?pid=%d", id), Name: "دریافت فایل های محصول", IsAdmin: false},
 		{Path: fmt.Sprintf("/search/product?page=1&brand=%d&type=%d", product.Brand.ID, product.Type.ID), Name: "جستجو قبلی", IsAdmin: false},
 		{Path: "/menu", Name: "منو اصلی", IsAdmin: false},
-	}, false)
+	}, isAdmin)
 
 	msg.ParseMode = tgbotapi.ModeMarkdown
 	bot.SendMessage(ac, msg)

@@ -124,15 +124,15 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 
 	// -------------------- Products
 	r.Handle("/product/{entity}/{action}", func(vars router.PathVars, queries router.UrlQueries) {
-		if !bot.IsSuperRole(update, ac) {
-			return
-		}
-
 		pageQ, pageOk := queries["page"]
 		page, pageErr := strconv.Atoi(pageQ)
 		msID := update.CallbackQuery.Message.MessageID
 
 		if vars["action"] == "add" {
+			if !bot.IsSuperRole(update, ac) {
+				return
+			}
+
 			brandQ, brandOk := queries["brand"]
 			typeQ, typeOk := queries["type"]
 
@@ -172,6 +172,9 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 			case "get":
 				commands.GetProduct(ac, update, int64(id))
 			case "update":
+				if !bot.IsSuperRole(update, ac) {
+					return
+				}
 				field, fieldOk := queries["field"]
 
 				if fieldOk && field != "" {
@@ -214,6 +217,9 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 					commands.UpdateProductMenu(ac, update, id)
 				}
 			case "remove":
+				if !bot.IsSuperRole(update, ac) {
+					return
+				}
 				state := bot.ResetUserState(update, ac)
 				state.Data["id"] = pID
 				conversations.RemoveProduct(update, ac, state)
@@ -221,6 +227,10 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 				commands.GetProductFile(ac, update, int64(id))
 			}
 
+			return
+		}
+
+		if !bot.IsSuperRole(update, ac) {
 			return
 		}
 
