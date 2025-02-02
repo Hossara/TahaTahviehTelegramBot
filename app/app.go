@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"gorm.io/gorm"
 	"sync"
 	"taha_tahvieh_tg_bot/config"
@@ -116,12 +117,12 @@ func (a *app) setStorageService() {
 	if a.storageService == nil {
 		minioConfig := a.cfg.Minio
 
-		client := storageAdapter.NewStorageRepo(minio.Config{
+		client := storageAdapter.NewStorageRepo(a.cfg.Server, minio.Config{
 			Endpoint:        minioConfig.Endpoint,
 			AccessKeyID:     minioConfig.AccessKeyID,
 			SecretAccessKey: minioConfig.SecretAccessKey,
 			SSL:             minioConfig.SSL,
-		})
+		}, a.ctx)
 
 		a.storageService = storage.NewService(a.ctx, database.NewStorageRepo(a.db), client)
 
