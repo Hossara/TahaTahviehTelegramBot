@@ -17,7 +17,7 @@ import (
 	"taha_tahvieh_tg_bot/server/menus"
 )
 
-func AddProduct(update tgbotapi.Update, ac app.App, state *app.UserState, brandID int, typeID int) {
+func AddProduct(update tgbotapi.Update, ac app.App, state *app.UserState, brandID int, typeID, page, prev int) {
 	switch state.Step {
 	case 0:
 		state.Active = true
@@ -38,20 +38,25 @@ func AddProduct(update tgbotapi.Update, ac app.App, state *app.UserState, brandI
 		state.Step = 2
 
 	case 2:
-		if update.Message.Text == "" {
-			bot.SendText(ac, update, "لطفا یک متن توضیحات معتبر ارسال کنید!")
-			return
+		if state.Data["description"] == "" {
+			if update.Message.Text == "" {
+				bot.SendText(ac, update, "لطفا یک متن توضیحات معتبر ارسال کنید!")
+				return
+			}
+
+			state.Data["description"] = strings.TrimSpace(update.Message.Text)
 		}
 
-		state.Data["description"] = strings.TrimSpace(update.Message.Text)
-
-		commands.SelectProductMenu(
-			ac, update, "add_product", "brand",
-			"لطفا برند محصول را انتخاب کنید",
-			1, 0, map[string]string{},
-		)
-
-		state.Step = 3
+		if brandID == 0 {
+			commands.SelectProductMenu(
+				ac, update, "add_product", "brand",
+				"لطفا برند محصول را انتخاب کنید",
+				page, prev, map[string]string{},
+			)
+		} else {
+			state.Step = 3
+			AddProduct(update, ac, state, brandID, typeID, page, prev)
+		}
 	case 3:
 		if brandID == 0 {
 			bot.SendText(ac, update, "آیدی برند نامعتبر بود")
@@ -59,15 +64,18 @@ func AddProduct(update tgbotapi.Update, ac app.App, state *app.UserState, brandI
 		}
 		state.Data["brand"] = strconv.Itoa(brandID)
 
-		commands.SelectProductMenu(
-			ac, update, "add_product", "type",
-			"لطفا دسته‌بندی محصول را انتخاب کنید",
-			1, 0, map[string]string{
-				"brand": strconv.Itoa(brandID),
-			},
-		)
-
-		state.Step = 4
+		if typeID == 0 {
+			commands.SelectProductMenu(
+				ac, update, "add_product", "type",
+				"لطفا دسته‌بندی محصول را انتخاب کنید",
+				page, prev, map[string]string{
+					"brand": strconv.Itoa(brandID),
+				},
+			)
+		} else {
+			state.Step = 4
+			AddProduct(update, ac, state, brandID, typeID, page, prev)
+		}
 	case 4:
 		if typeID == 0 {
 			bot.SendText(ac, update, "آیدی دسته‌بندی نامعتبر بود")

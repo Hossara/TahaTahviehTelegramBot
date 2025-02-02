@@ -128,6 +128,8 @@ func SelectProductMenu(ac app.App, update tgbotapi.Update, action, menu, text st
 		act := map[string]string{
 			"search":      "/search/type",
 			"add_product": "/product/product/add",
+			"remove":      "/product/type/remove",
+			"update":      "/product/type/update",
 		}
 
 		menuItems = utils.Map(brands.Data, func(t *productDomain.Brand) menus.MenuItem {
@@ -137,17 +139,18 @@ func SelectProductMenu(ac app.App, update tgbotapi.Update, action, menu, text st
 			}
 		})
 
+		nav := map[string]string{
+			"search":      "/search/brand",
+			"add_product": "/product/product/add",
+			"remove":      "/product/type/remove",
+			"update":      "/product/type/update",
+		}
+
 		keyboard = keyboards.InlinePaginationColumnKeyboard(
 			addMain(menuItems), false,
-			page, brands.Pages, fmt.Sprintf("/search/brand?page=%d", page), "page")
+			page, brands.Pages, fmt.Sprintf("%s?page=%d", nav[action], page), "page")
 	case "type":
-		brandID, err := strconv.Atoi(meta["brand"])
-
-		if err != nil {
-			log.Println(err)
-			bot.SendText(ac, update, "برند نامعتبر!")
-			return
-		}
+		brandID, _ := strconv.Atoi(meta["brand"])
 
 		types, err := ac.ProductService().GetAllProductTypes(page, 10)
 
@@ -160,6 +163,8 @@ func SelectProductMenu(ac app.App, update tgbotapi.Update, action, menu, text st
 		act := map[string]string{
 			"search":      "/search/product",
 			"add_product": "/product/product/add",
+			"remove":      "/product/type/remove",
+			"update":      "/product/type/update",
 		}
 
 		menuItems = utils.Map(types.Data, func(t *productDomain.ProductType) menus.MenuItem {
@@ -169,9 +174,16 @@ func SelectProductMenu(ac app.App, update tgbotapi.Update, action, menu, text st
 			}
 		})
 
+		nav := map[string]string{
+			"search":      "/search/type",
+			"add_product": "/product/product/add",
+			"remove":      "/product/type/remove",
+			"update":      "/product/type/update",
+		}
+
 		keyboard = keyboards.InlinePaginationColumnKeyboard(
 			addMain(menuItems), false,
-			page, types.Pages, fmt.Sprintf("/search/type?page=%d&brand=%d", page, brandID), "page")
+			page, types.Pages, fmt.Sprintf("%s?page=%d&brand=%d", nav[action], page, brandID), "page")
 	}
 
 	send(ac, update, text, page, prev, keyboard)

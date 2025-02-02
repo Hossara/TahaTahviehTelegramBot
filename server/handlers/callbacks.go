@@ -126,6 +126,10 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 			return
 		}
 
+		pageQ, pageOk := queries["page"]
+		page, pageErr := strconv.Atoi(pageQ)
+		msID := update.CallbackQuery.Message.MessageID
+
 		if vars["action"] == "add" {
 			brandQ, brandOk := queries["brand"]
 			typeQ, typeOk := queries["type"]
@@ -135,7 +139,7 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 
 			var state *app.UserState
 
-			if (brandOk && brandErr == nil) || (typeOk && typeErr == nil) {
+			if (brandOk && brandErr == nil) || (typeOk && typeErr == nil) || (pageOk && pageErr == nil) {
 				state = ac.AppState(update.SentFrom().ID)
 			} else {
 				state = bot.ResetUserState(update, ac)
@@ -143,7 +147,7 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 
 			switch vars["entity"] {
 			case "product":
-				conversations.AddProduct(update, ac, state, brandID, typeID)
+				conversations.AddProduct(update, ac, state, brandID, typeID, page, msID)
 			case "brand":
 				conversations.AddBrand(update, ac, state)
 			case "type":
@@ -174,15 +178,6 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 			case "files":
 			}
 
-			return
-		}
-
-		pageQ, pageOk := queries["page"]
-
-		page, pageErr := strconv.Atoi(pageQ)
-
-		if !pageOk || pageErr != nil {
-			bot.SendText(ac, update, "صفحه نامعتبر است.")
 			return
 		}
 
