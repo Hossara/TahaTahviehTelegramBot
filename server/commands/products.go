@@ -18,6 +18,10 @@ import (
 )
 
 func ProductManagementMenu(ac app.App, update tgbotapi.Update, menu [][]menus.MenuItem) {
+	if !bot.IsSuperRole(update, ac) {
+		return
+	}
+
 	msg := tgbotapi.NewMessage(update.FromChat().ID, constants.MenuResponse)
 
 	msg.ReplyMarkup = keyboards.InlineKeyboard(menu, true)

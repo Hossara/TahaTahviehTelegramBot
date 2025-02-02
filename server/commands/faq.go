@@ -114,6 +114,10 @@ func GetFaq(ac app.App, update tgbotapi.Update, id uint64) {
 }
 
 func FaqMenu(ac app.App, update tgbotapi.Update) {
+	if !bot.IsSuperRole(update, ac) {
+		return
+	}
+
 	msg := tgbotapi.NewMessage(update.FromChat().ID, "منو سوالات پرتکرار خدمت شما")
 
 	msg.ReplyMarkup = keyboards.InlineKeyboard(menus.FaqMenu, true)
@@ -122,6 +126,10 @@ func FaqMenu(ac app.App, update tgbotapi.Update) {
 }
 
 func RemoveFaqMenu(ac app.App, update tgbotapi.Update) {
+	if !bot.IsSuperRole(update, ac) {
+		return
+	}
+
 	questions, err := ac.FaqService().GetAllQuestions()
 
 	if err != nil {
@@ -137,6 +145,10 @@ func RemoveFaqMenu(ac app.App, update tgbotapi.Update) {
 }
 
 func UpdateFaqMenu(ac app.App, update tgbotapi.Update) {
+	if !bot.IsSuperRole(update, ac) {
+		return
+	}
+
 	questions, err := ac.FaqService().GetAllQuestions()
 
 	if err != nil {
