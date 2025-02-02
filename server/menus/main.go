@@ -3,11 +3,11 @@ package menus
 var MainMenu = [][]MenuItem{
 	{
 		{Path: "/search", IsAdmin: false, Name: "جستجوی محصول"},
-		{Path: "/manage/product", IsAdmin: true, Name: "افزودن محصول"},
+		{Path: "/product/product/add", IsAdmin: true, Name: "افزودن محصول"},
 	},
 	{
 		{Path: "/manage/brands", IsAdmin: true, Name: "مدیریت برند ها"},
-		{Path: "/product/product/add", IsAdmin: true, Name: "مدیریت دسته‌بندی ها"},
+		{Path: "/manage/product_types", IsAdmin: true, Name: "مدیریت دسته‌بندی ها"},
 	},
 	{
 		{Path: "/support", IsAdmin: false, Name: "ارتباط‌ با پشتیبانی"},
