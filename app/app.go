@@ -128,6 +128,12 @@ func (a *app) setStorageService() {
 		if err := a.storageService.RunMigrations(); err != nil {
 			panic("failed to run migrations for storage service!")
 		}
+
+		err := a.storageService.InitBucket("products")
+
+		if err != nil {
+			panic(fmt.Errorf("failed to initialize storage bucket: %s", err))
+		}
 	}
 }
 
