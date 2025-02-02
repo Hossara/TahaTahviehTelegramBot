@@ -75,6 +75,30 @@ func RemoveType(ac app.App, update tgbotapi.Update, typeID int) {
 	bot.SendText(ac, update, "دسته‌بندی با موفقیت حذف شد.")
 }
 
+func UpdateProductMenu(ac app.App, update tgbotapi.Update, id int) {
+	msg := tgbotapi.NewMessage(update.FromChat().ID, "کدام ویژگی از محصول را می‌خواهید ویرایش کنید؟")
+
+	base := "/product/product/update"
+
+	msg.ReplyMarkup = keyboards.InlineKeyboard([][]menus.MenuItem{
+		{
+			{Path: fmt.Sprintf("%s?pid=%d&field=%s", base, id, "description"), Name: "توضیحات محصول", IsAdmin: false},
+			{Path: fmt.Sprintf("%s?pid=%d&field=%s", base, id, "name"), Name: "نام محصول", IsAdmin: false},
+		},
+		{
+			{Path: fmt.Sprintf("%s?pid=%d&field=%s", base, id, "brand"), Name: "برند محصول", IsAdmin: false},
+		},
+		{
+			{Path: fmt.Sprintf("%s?pid=%d&field=%s", base, id, "type"), Name: "دسته‌بندی محصول", IsAdmin: false},
+		},
+		{
+			{Path: fmt.Sprintf("%s?pid=%d&field=%s", base, id, "files"), Name: "فایل های محصول", IsAdmin: false},
+		},
+	}, false)
+
+	bot.SendMessage(ac, msg)
+}
+
 func GetProduct(ac app.App, update tgbotapi.Update, id int64) {
 	product, err := ac.ProductService().GetProduct(productDomain.ProductID(id))
 

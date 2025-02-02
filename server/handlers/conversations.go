@@ -11,6 +11,7 @@ var gaps = map[string]func(update tgbotapi.Update, ac app.App, state *app.UserSt
 	"add_product_type":    conversations.AddProductType,
 	"update_product_type": conversations.UpdateProductType,
 	"update_brand":        conversations.UpdateBrand,
+	"update_product_info": conversations.UpdateProductInfo,
 	"remove_product":      conversations.RemoveProduct,
 	"update_about":        conversations.UpdateAbout,
 	"update_help":         conversations.UpdateHelp,

@@ -158,7 +158,6 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 
 		if vars["entity"] == "product" {
 			pID, idOk := queries["pid"]
-
 			id, idErr := strconv.Atoi(pID)
 
 			if !idOk || idErr != nil {
@@ -171,6 +170,22 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 			case "get":
 				commands.GetProduct(ac, update, int64(id))
 			case "update":
+				field, fieldOk := queries["field"]
+
+				if fieldOk && field != "" {
+					switch field {
+					case "name", "description":
+						state := bot.ResetUserState(update, ac)
+						state.Data["id"] = pID
+						state.Data["field"] = field
+						conversations.UpdateProductInfo(update, ac, state)
+					case "brand":
+					case "type":
+					case "files":
+					}
+				} else {
+					commands.UpdateProductMenu(ac, update, id)
+				}
 			case "remove":
 				state := bot.ResetUserState(update, ac)
 				state.Data["id"] = pID
