@@ -7,6 +7,7 @@ require (
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/google/uuid v1.6.0
+	github.com/h2non/filetype v1.1.3
 	github.com/minio/minio-go/v7 v7.0.83
 	golang.org/x/net v0.33.0
 	gorm.io/driver/postgres v1.5.11

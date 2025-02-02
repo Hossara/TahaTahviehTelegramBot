@@ -1,6 +1,7 @@
 package port
 
 import (
+	"io"
 	"taha_tahvieh_tg_bot/internal/product_storage/domain"
 
 	productDomain "taha_tahvieh_tg_bot/internal/product/domain"
@@ -11,7 +12,8 @@ type ClientRepo interface {
 	BucketExists(name string) (bool, error)
 	CreateBucket(name string) error
 
-	UploadFile(file *domain.File) error
+	UploadFile(file *domain.File, url string) error
+	StreamFile(bucket, name string) (io.ReadCloser, error)
 
 	DeleteFile(bucket string, filePath string) error
 	DeleteMultipleFiles(bucket string, filePaths []string) error

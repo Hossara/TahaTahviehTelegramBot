@@ -1,12 +1,19 @@
 package storage
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
 	"github.com/minio/minio-go/v7"
+	"golang.org/x/net/proxy"
+	"io"
 	"log"
+	"net"
+	"net/http"
+	"taha_tahvieh_tg_bot/config"
 	"taha_tahvieh_tg_bot/internal/product_storage/domain"
+	storageDomain "taha_tahvieh_tg_bot/internal/storage/domain"
 	"taha_tahvieh_tg_bot/internal/storage/port"
 	minioPkg "taha_tahvieh_tg_bot/pkg/minio"
 )
@@ -14,17 +21,87 @@ import (
 type storageBucket struct {
 	client *minio.Client
 	ctx    context.Context
+	svcCfg config.ServerConfig
 }
 
-func NewStorageRepo(config minioPkg.Config) port.ClientRepo {
+func NewStorageRepo(svcCfg config.ServerConfig, config minioPkg.Config, ctx context.Context) port.ClientRepo {
 	client := minioPkg.MustNewMinioClient(config)
 
-	return &storageBucket{client: client}
+	return &storageBucket{client: client, ctx: ctx, svcCfg: svcCfg}
 }
 
-func (s *storageBucket) UploadFile(file *domain.File) error {
-	info, err := s.client.FPutObject(
-		s.ctx, file.BucketName, file.UUID.String(), file.Path,
+func (s *storageBucket) StreamFile(bucket, name string) (io.ReadCloser, error) {
+	object, err := s.client.GetObject(s.ctx, bucket, name, minio.GetObjectOptions{})
+
+	if err != nil {
+		return nil, err
+	}
+	defer object.Close()
+
+	return object, nil
+}
+
+func (s *storageBucket) getSocks() (*http.Client, error) {
+	dialer, err := proxy.SOCKS5("tcp", s.svcCfg.Proxy, nil, proxy.Direct)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to create SOCKS5 dialer: %v", err)
+	}
+
+	transport := &http.Transport{
+		DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+			return dialer.Dial(network, addr)
+		},
+	}
+
+	client := &http.Client{Transport: transport}
+
+	return client, err
+}
+
+func (s *storageBucket) UploadFile(file *domain.File, url string) error {
+	var resp *http.Response
+	var err error
+
+	if s.svcCfg.Proxy != "" {
+		client, err := s.getSocks()
+		if err != nil {
+			return fmt.Errorf("failed to create SOCKS5 proxy client: %v", err)
+		}
+
+		resp, err = client.Get(url)
+	} else {
+		resp, err = http.Get(url)
+	}
+
+	if err != nil {
+		return fmt.Errorf("failed to download file: %v", err)
+	}
+
+	if resp == nil {
+		return errors.New("failed to download file")
+	}
+
+	defer resp.Body.Close()
+
+	// Read the file into memory
+	fileData, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read file: %v", err)
+	}
+
+	file.ContentType = storageDomain.ContentType(http.DetectContentType(fileData))
+	format, err := ExtractFileFormat(bytes.NewReader(fileData))
+
+	if err != nil {
+		return fmt.Errorf("failed to extract file format: %v", err)
+	}
+
+	file.Format = format
+
+	info, err := s.client.PutObject(
+		s.ctx, file.BucketName, FileToFilePath(*file), bytes.NewReader(fileData),
+		int64(len(fileData)),
 		minio.PutObjectOptions{
 			ContentType: string(file.ContentType),
 		},
@@ -33,7 +110,7 @@ func (s *storageBucket) UploadFile(file *domain.File) error {
 	if err == nil {
 		log.Printf(
 			"New file uploaded successfuly. File Name: %s\tFile Size: %d\tProduct: %d",
-			FileToFileName(*file), info.Size, file.ProductID,
+			FileToFilePath(*file), info.Size, file.ProductID,
 		)
 	}
 
