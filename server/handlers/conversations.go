@@ -36,6 +36,9 @@ func HandleConversations(update tgbotapi.Update, ac app.App) {
 
 		case "update_product_meta":
 			conversations.UpdateProductMeta(update, ac, userState, 0, 1, 0)
+
+		case "search_by_title":
+			conversations.SearchByTitle(update, ac, userState, 1, 0)
 		}
 	}
 }

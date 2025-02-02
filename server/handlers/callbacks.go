@@ -72,6 +72,8 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 
 		switch vars["query"] {
 		case "title":
+			state := bot.ResetUserState(update, ac)
+			conversations.SearchByTitle(update, ac, state, page, msID)
 		case "type":
 			commands.SelectProductMenu(
 				ac, update, "search", "type",
