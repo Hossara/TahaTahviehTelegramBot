@@ -107,7 +107,7 @@ func (r *service) GetProduct(id productDomain.ProductID) (*domain.Product, error
 		return nil, ErrInvalidID
 	}
 
-	product, err := r.repo.FindByID(id, false)
+	product, err := r.repo.FindByID(id, true)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch product: %w", err)

@@ -58,11 +58,7 @@ func (r *productRepo) FindAllByMeta(
 
 	query := r.db
 
-	if brandID > 0 {
-		query = query.Where("brand_id = ?", brandID)
-	} else if productTypeID > 0 {
-		query = query.Where("type_id = ?", productTypeID)
-	}
+	query = query.Where("brand_id = ? AND type_id = ?", brandID, productTypeID)
 
 	if preload {
 		query = query.Preload("Brand").Preload("Type").Preload("Files")
@@ -117,7 +113,9 @@ func (r *productRepo) FindByID(id productDomain.ProductID, preload bool) (*domai
 		db = db.Preload("Brand").Preload("Type").Preload("Files")
 	}
 
-	return mapper.ToDomainProduct(&product), db.First(&product, id).Error
+	err := db.First(&product, id).Error
+
+	return mapper.ToDomainProduct(&product), err
 }
 
 // UpdateByID updates a product partially by ID
