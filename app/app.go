@@ -89,6 +89,7 @@ func (a *app) ProductService() productPort.Service {
 	if a.productService == nil {
 		a.productService = product.NewService(
 			a.ctx, database.NewProductRepo(a.db), database.NewProductMetaRepo(a.db),
+			a.StorageService(),
 		)
 
 		if err := a.productService.RunProductMigrations(); err != nil {

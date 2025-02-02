@@ -7,6 +7,7 @@ import (
 	productDomain "taha_tahvieh_tg_bot/internal/product/domain"
 	"taha_tahvieh_tg_bot/internal/product/port"
 	"taha_tahvieh_tg_bot/internal/product_storage/domain"
+	storagePort "taha_tahvieh_tg_bot/internal/storage/port"
 )
 
 var (
@@ -18,14 +19,16 @@ var (
 type service struct {
 	repo     port.Repo
 	metaRepo port.MetaRepo
+	storage  storagePort.Service
 	ctx      context.Context
 }
 
-func NewService(ctx context.Context, repo port.Repo, metaRepo port.MetaRepo) port.Service {
+func NewService(ctx context.Context, repo port.Repo, metaRepo port.MetaRepo, storage storagePort.Service) port.Service {
 	return &service{
 		ctx:      ctx,
 		repo:     repo,
 		metaRepo: metaRepo,
+		storage:  storage,
 	}
 }
 
@@ -154,9 +157,24 @@ func (r *service) DeleteBrand(id productDomain.BrandID) error {
 	panic("implement me")
 }
 
-func (r *service) DeleteProduct(id productDomain.ProductID) error {
-	//TODO implement me
-	panic("implement me")
+func (r *service) DeleteProduct(id productDomain.ProductID, files []domain.File) error {
+	if id == 0 {
+		return ErrInvalidID
+	}
+
+	err := r.storage.RemoveAllFiles(files)
+
+	if err != nil {
+		return fmt.Errorf("error deleting product files: %w", err)
+	}
+
+	err = r.repo.DeleteById(id)
+
+	if err != nil {
+		return fmt.Errorf("error deleting product: %w", err)
+	}
+
+	return nil
 }
 
 func (r *service) UpdateProduct(id productDomain.ProductID, updates map[string]interface{}) error {

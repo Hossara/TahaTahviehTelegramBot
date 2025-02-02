@@ -24,7 +24,7 @@ type Service interface {
 
 	DeleteProductType(id productDomain.ProductTypeID) error
 	DeleteBrand(id productDomain.BrandID) error
-	DeleteProduct(id productDomain.ProductID) error
+	DeleteProduct(id productDomain.ProductID, files []domain.File) error
 
 	UpdateProduct(id productDomain.ProductID, updates map[string]interface{}) error
 	UpdateBrand(id productDomain.BrandID, updates map[string]interface{}) error

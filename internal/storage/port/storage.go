@@ -13,7 +13,7 @@ type Service interface {
 	UploadFile(file *domain.File, url string) (storageDomain.FileID, error)
 
 	RemoveFile(filePath string) error
-	RemoveAllProductFiles(productID productDomain.ProductID) error
+	RemoveAllFiles(files []domain.File) error
 
 	GetProductFiles(productID productDomain.ProductID) ([]*domain.File, error)
 
