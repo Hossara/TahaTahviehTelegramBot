@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"taha_tahvieh_tg_bot/internal/product_storage/domain"
+	storageDomain "taha_tahvieh_tg_bot/internal/storage/domain"
 	"taha_tahvieh_tg_bot/internal/storage/port"
+	"taha_tahvieh_tg_bot/pkg/adapters/storage"
 
 	productDomain "taha_tahvieh_tg_bot/internal/product/domain"
 )
@@ -44,9 +46,26 @@ func (r *service) InitBucket(name string) error {
 	return err
 }
 
-func (r *service) UploadFile(file *domain.File) error {
-	//TODO implement me
-	panic("implement me")
+func (r *service) UploadFile(file *domain.File, url string) (storageDomain.FileID, error) {
+	err := r.clientRepo.UploadFile(file, url)
+
+	if err != nil {
+		return 0, fmt.Errorf("error uploading file: %v", err)
+	}
+
+	id, err := r.repo.Insert(file)
+
+	if err != nil {
+		errDel := r.clientRepo.DeleteFile(file.BucketName, storage.FileToFilePath(*file))
+
+		if errDel != nil {
+			return 0, fmt.Errorf("error inserting & deleting file: %v", err)
+		}
+
+		return 0, fmt.Errorf("error inserting file: %v", err)
+	}
+
+	return id, nil
 }
 
 func (r *service) RemoveFile(filePath string) error {
