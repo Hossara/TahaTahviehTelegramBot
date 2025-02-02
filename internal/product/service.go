@@ -10,7 +10,9 @@ import (
 )
 
 var (
-	ErrPaginationInvalid = errors.New("invalid pagination parameters")
+	ErrPaginationInvalid  = errors.New("invalid pagination parameters")
+	ErrBrandOrTypeInvalid = errors.New("brand or type invalid")
+	ErrInvalidID          = errors.New("invalid id")
 )
 
 type service struct {
@@ -25,6 +27,20 @@ func NewService(ctx context.Context, repo port.Repo, metaRepo port.MetaRepo) por
 		repo:     repo,
 		metaRepo: metaRepo,
 	}
+}
+
+func (r *service) CreateProduct(product *domain.Product) (productDomain.ProductID, error) {
+	if product.Brand.ID == 0 || product.Type.ID == 0 {
+		return 0, ErrBrandOrTypeInvalid
+	}
+
+	id, err := r.repo.Insert(product)
+
+	if err != nil {
+		return 0, fmt.Errorf("error while insert product: %w", err)
+	}
+
+	return id, nil
 }
 
 func (r *service) GetAllProductsBasedOn(
@@ -87,8 +103,17 @@ func (r *service) GetAllProductTypes(page, pageSize int) (productDomain.ProductT
 }
 
 func (r *service) GetProduct(id productDomain.ProductID) (*domain.Product, error) {
-	//TODO implement me
-	panic("implement me")
+	if id == 0 {
+		return nil, ErrInvalidID
+	}
+
+	product, err := r.repo.FindByID(id, false)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch product: %w", err)
+	}
+
+	return product, nil
 }
 
 func (r *service) CreateBrand(brand *productDomain.Brand) error {
@@ -135,8 +160,20 @@ func (r *service) DeleteProduct(id productDomain.ProductID) error {
 }
 
 func (r *service) UpdateProduct(id productDomain.ProductID, updates map[string]interface{}) error {
-	//TODO implement me
-	panic("implement me")
+	if id == 0 {
+		return ErrInvalidID
+	}
+
+	if len(updates) == 0 {
+		return nil
+	}
+
+	err := r.repo.UpdateByID(id, updates)
+
+	if err != nil {
+		return fmt.Errorf("error updating product: %w", err)
+	}
+	return nil
 }
 
 func (r *service) UpdateBrand(id productDomain.BrandID, updates map[string]interface{}) error {

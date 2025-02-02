@@ -12,5 +12,5 @@ type Product struct {
 	Type        ProductType `gorm:"foreignKey:TypeID"`
 	Description string      `gorm:"type:text"`
 
-	Files []File `gorm:"foreignKey:ProductID"` // Relationship to files
+	Files []File `gorm:"foreignKey:ProductID;constraint:OnDelete:CASCADE"`
 }

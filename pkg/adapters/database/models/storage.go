@@ -10,7 +10,5 @@ type File struct {
 	Format      string    `gorm:"type:varchar(50);not null"`  // File format (e.g., png, pdf)
 	Size        int64     `gorm:"not null"`                   // File size in bytes
 	ContentType string    `gorm:"type:varchar(50);not null"`  // MIME type for content
-
-	ProductID int64   `gorm:"not null"`
-	Product   Product `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;foreignKey:ProductID"` // Relation to Product
+	ProductID   int64     `gorm:"not null"`                   // Foreign key
 }

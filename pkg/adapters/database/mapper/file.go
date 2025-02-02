@@ -31,8 +31,5 @@ func ToModelFile(d *domain.File) *models.File {
 		Size:        d.Size,
 		ContentType: string(d.ContentType),
 		ProductID:   int64(d.ProductID),
-		Product: models.Product{
-			ID: int64(d.ProductID),
-		},
 	}
 }
