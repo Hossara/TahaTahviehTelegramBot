@@ -148,13 +148,31 @@ func (r *service) CreateProductType(productType *productDomain.ProductType) erro
 }
 
 func (r *service) DeleteProductType(id productDomain.ProductTypeID) error {
-	//TODO implement me
-	panic("implement me")
+	if id == 0 {
+		return ErrInvalidID
+	}
+
+	err := r.metaRepo.DeleteProductType(id)
+
+	if err != nil {
+		return fmt.Errorf("error deleting product type: %w", err)
+	}
+
+	return nil
 }
 
 func (r *service) DeleteBrand(id productDomain.BrandID) error {
-	//TODO implement me
-	panic("implement me")
+	if id == 0 {
+		return ErrInvalidID
+	}
+
+	err := r.metaRepo.DeleteBrand(id)
+
+	if err != nil {
+		return fmt.Errorf("error deleting brand: %w", err)
+	}
+
+	return nil
 }
 
 func (r *service) DeleteProduct(id productDomain.ProductID, files []domain.File) error {

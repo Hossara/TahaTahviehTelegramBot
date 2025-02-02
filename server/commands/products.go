@@ -47,6 +47,34 @@ func addMain(menu []menus.MenuItem) []menus.MenuItem {
 	return append(menu, menus.MenuItem{Name: "منو اصلی", IsAdmin: false, Path: "/menu"})
 }
 
+func RemoveBrand(ac app.App, update tgbotapi.Update, brandID int) {
+	bot.SendText(ac, update, "درحال حذف برند...")
+
+	err := ac.ProductService().DeleteBrand(productDomain.BrandID(brandID))
+
+	if err != nil {
+		log.Println(err)
+		bot.SendText(ac, update, "خطا هنگام حذف برند!")
+		return
+	}
+
+	bot.SendText(ac, update, "برند با موفقیت حذف شد.")
+}
+
+func RemoveType(ac app.App, update tgbotapi.Update, typeID int) {
+	bot.SendText(ac, update, "درحال حذف دسته‌بندی...")
+
+	err := ac.ProductService().DeleteProductType(productDomain.ProductTypeID(typeID))
+
+	if err != nil {
+		log.Println(err)
+		bot.SendText(ac, update, "خطا هنگام حذف دسته‌بندی!")
+		return
+	}
+
+	bot.SendText(ac, update, "دسته‌بندی با موفقیت حذف شد.")
+}
+
 func GetProduct(ac app.App, update tgbotapi.Update, id int64) {
 	product, err := ac.ProductService().GetProduct(productDomain.ProductID(id))
 
@@ -128,8 +156,8 @@ func SelectProductMenu(ac app.App, update tgbotapi.Update, action, menu, text st
 		act := map[string]string{
 			"search":      "/search/type",
 			"add_product": "/product/product/add",
-			"remove":      "/product/type/remove",
-			"update":      "/product/type/update",
+			"remove":      "/product/brand/remove",
+			"update":      "/product/brand/update",
 		}
 
 		menuItems = utils.Map(brands.Data, func(t *productDomain.Brand) menus.MenuItem {
@@ -142,8 +170,8 @@ func SelectProductMenu(ac app.App, update tgbotapi.Update, action, menu, text st
 		nav := map[string]string{
 			"search":      "/search/brand",
 			"add_product": "/product/product/add",
-			"remove":      "/product/type/remove",
-			"update":      "/product/type/update",
+			"remove":      "/product/brand/remove",
+			"update":      "/product/brand/update",
 		}
 
 		keyboard = keyboards.InlinePaginationColumnKeyboard(

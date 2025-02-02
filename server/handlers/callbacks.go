@@ -182,12 +182,24 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 		}
 
 		if vars["entity"] == "brand" || vars["entity"] == "type" {
-			actionText := map[string]string{
-				"remove": "حذف", "update": "ویرایش",
+			actionText := map[string]string{"remove": "حذف", "update": "ویرایش"}
+
+			categoryText := map[string]string{"brand": "برند", "type": "دسته‌بندی محصول"}
+
+			brandQ, brandOk := queries["brand"]
+			typeQ, typeOk := queries["type"]
+
+			brandID, brandErr := strconv.Atoi(brandQ)
+			typeID, typeErr := strconv.Atoi(typeQ)
+
+			if vars["entity"] == "brand" && brandOk && brandErr == nil {
+				commands.RemoveBrand(ac, update, brandID)
+				return
 			}
 
-			categoryText := map[string]string{
-				"brand": "برند", "type": "دسته‌بندی محصول",
+			if vars["entity"] == "type" && typeOk && typeErr == nil {
+				commands.RemoveType(ac, update, typeID)
+				return
 			}
 
 			commands.SelectProductMenu(
