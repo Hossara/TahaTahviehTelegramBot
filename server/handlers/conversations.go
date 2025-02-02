@@ -7,7 +7,6 @@ import (
 )
 
 var gaps = map[string]func(update tgbotapi.Update, ac app.App, state *app.UserState){
-	"add_product":      conversations.AddProduct,
 	"add_brand":        conversations.AddBrand,
 	"add_product_type": conversations.AddProductType,
 
@@ -21,6 +20,15 @@ func HandleConversations(update tgbotapi.Update, ac app.App) {
 	userState := ac.AppState(update.SentFrom().ID)
 
 	if userState.Active {
-		gaps[userState.Conversation](update, ac, userState)
+		fun, ok := gaps[userState.Conversation]
+
+		if ok {
+			fun(update, ac, userState)
+		}
+
+		switch userState.Conversation {
+		case "add_product":
+			conversations.AddProduct(update, ac, userState, 0, 0)
+		}
 	}
 }

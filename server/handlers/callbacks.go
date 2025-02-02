@@ -105,17 +105,29 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 	})
 
 	// -------------------- Products
-	r.Handle("/product/menu/{entity}/{action}", func(vars router.PathVars, queries router.UrlQueries) {
+	r.Handle("/product/{entity}/{action}", func(vars router.PathVars, queries router.UrlQueries) {
 		if !bot.IsSuperRole(update, ac) {
 			return
 		}
 
 		if vars["action"] == "add" {
-			state := bot.ResetUserState(update, ac)
+			brandQ, brandOk := queries["brand"]
+			typeQ, typeOk := queries["type"]
+
+			brandID, brandErr := strconv.Atoi(brandQ)
+			typeID, typeErr := strconv.Atoi(typeQ)
+
+			var state *app.UserState
+
+			if (brandOk && brandErr == nil) || (typeOk && typeErr == nil) {
+				state = ac.AppState(update.SentFrom().ID)
+			} else {
+				state = bot.ResetUserState(update, ac)
+			}
 
 			switch vars["entity"] {
 			case "product":
-				conversations.AddProduct(update, ac, state)
+				conversations.AddProduct(update, ac, state, brandID, typeID)
 			case "brand":
 				conversations.AddBrand(update, ac, state)
 			case "type":
