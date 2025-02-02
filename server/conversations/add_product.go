@@ -1,7 +1,6 @@
 package conversations
 
 import (
-	"encoding/json"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/google/uuid"
 	"log"
@@ -10,7 +9,6 @@ import (
 	"taha_tahvieh_tg_bot/app"
 	productDomain "taha_tahvieh_tg_bot/internal/product/domain"
 	psDomain "taha_tahvieh_tg_bot/internal/product_storage/domain"
-	storageDomain "taha_tahvieh_tg_bot/internal/storage/domain"
 	"taha_tahvieh_tg_bot/pkg/bot"
 	"taha_tahvieh_tg_bot/server/commands"
 	"taha_tahvieh_tg_bot/server/keyboards"
@@ -118,8 +116,6 @@ func AddProduct(update tgbotapi.Update, ac app.App, state *app.UserState, brandI
 			bot.SendText(ac, update, "محصول نامعتبر است!")
 		}
 
-		var fileIDs []storageDomain.FileID
-
 		if len(update.Message.Photo) > 0 || update.Message.Document != nil {
 			if len(update.Message.Photo) > 0 {
 				bot.SendText(ac, update, "لطفا تا اتمام بارگزاری تمامی فایل ها پیامی ارسال نکنید!")
@@ -128,7 +124,7 @@ func AddProduct(update tgbotapi.Update, ac app.App, state *app.UserState, brandI
 				fileURL, _ := ac.Bot().GetFileDirectURL(photo.FileID)
 				bot.SendText(ac, update, "درحال آپلود تصویر...")
 
-				id, err := ac.StorageService().UploadFile(&psDomain.File{
+				_, err := ac.StorageService().UploadFile(&psDomain.File{
 					ProductID:  productDomain.ProductID(pId),
 					UUID:       uuid.New(),
 					BucketName: "products",
@@ -142,8 +138,6 @@ func AddProduct(update tgbotapi.Update, ac app.App, state *app.UserState, brandI
 					return
 				}
 
-				fileIDs = append(fileIDs, id)
-
 				bot.SendText(ac, update, "بارگزاری تصویر با موفقیت انجام شد.")
 			}
 
@@ -153,7 +147,7 @@ func AddProduct(update tgbotapi.Update, ac app.App, state *app.UserState, brandI
 				bot.SendText(ac, update, "در حال آپلود فایل ارسال شده...")
 				file := update.Message.Document
 
-				id, err := ac.StorageService().UploadFile(&psDomain.File{
+				_, err := ac.StorageService().UploadFile(&psDomain.File{
 					ProductID:  productDomain.ProductID(pId),
 					UUID:       uuid.New(),
 					BucketName: "products",
@@ -167,20 +161,9 @@ func AddProduct(update tgbotapi.Update, ac app.App, state *app.UserState, brandI
 					return
 				}
 
-				fileIDs = append(fileIDs, id)
-
 				bot.SendText(ac, update, "فایل با موفقیت آپلود شد.")
 			}
 
-			marshal, err := json.Marshal(fileIDs)
-
-			if err != nil {
-				log.Println(err)
-				bot.SendText(ac, update, "خطا ذخیره شناسه تصاویر!")
-				return
-			}
-
-			state.Data["file_ids"] = string(marshal)
 			return
 		}
 

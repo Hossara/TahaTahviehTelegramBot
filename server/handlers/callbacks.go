@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"taha_tahvieh_tg_bot/app"
 	"taha_tahvieh_tg_bot/pkg/bot"
-	router "taha_tahvieh_tg_bot/pkg/router"
+	"taha_tahvieh_tg_bot/pkg/router"
 	"taha_tahvieh_tg_bot/server/commands"
 	"taha_tahvieh_tg_bot/server/conversations"
 	"taha_tahvieh_tg_bot/server/menus"
@@ -203,6 +203,10 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 
 						conversations.UpdateProductMeta(update, ac, state, metaId, page, msID)
 					case "files":
+						state := bot.ResetUserState(update, ac)
+						state.Data["id"] = pID
+
+						conversations.UpdateProductFiles(update, ac, state)
 					}
 				} else {
 					commands.UpdateProductMenu(ac, update, id)

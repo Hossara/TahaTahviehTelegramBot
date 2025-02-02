@@ -84,6 +84,22 @@ func (r *service) RemoveAllFiles(files []domain.File) error {
 	return nil
 }
 
+func (r *service) RemoveAllProductFiles(productID productDomain.ProductID, files []domain.File) error {
+	err := r.repo.DeleteAllFilesByProductID(productID)
+
+	if err != nil {
+		return fmt.Errorf("error deleting files: %v", err)
+	}
+
+	err = r.RemoveAllFiles(files)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *service) GetProductFiles(productID productDomain.ProductID) ([]*domain.File, error) {
 	//TODO implement me
 	panic("implement me")

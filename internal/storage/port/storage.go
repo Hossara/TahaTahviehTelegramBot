@@ -14,6 +14,7 @@ type Service interface {
 
 	RemoveFile(filePath string) error
 	RemoveAllFiles(files []domain.File) error
+	RemoveAllProductFiles(productID productDomain.ProductID, files []domain.File) error
 
 	GetProductFiles(productID productDomain.ProductID) ([]*domain.File, error)
 
