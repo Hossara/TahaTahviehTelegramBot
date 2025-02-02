@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"taha_tahvieh_tg_bot/internal/product_storage/domain"
 	storageDomain "taha_tahvieh_tg_bot/internal/storage/domain"
 	"taha_tahvieh_tg_bot/internal/storage/port"
@@ -100,9 +101,14 @@ func (r *service) RemoveAllProductFiles(productID productDomain.ProductID, files
 	return nil
 }
 
-func (r *service) GetProductFiles(productID productDomain.ProductID) ([]*domain.File, error) {
-	//TODO implement me
-	panic("implement me")
+func (r *service) GetProductFile(file domain.File) (io.ReadCloser, error) {
+	streamFile, err := r.clientRepo.StreamFile(file.BucketName, storage.FileToFilePath(file))
+
+	if err != nil {
+		return nil, fmt.Errorf("error streaming file: %v", err)
+	}
+
+	return streamFile, nil
 }
 
 func (r *service) RunMigrations() error {

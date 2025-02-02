@@ -30,6 +30,16 @@ func SendMessage(ac app.App, c tgbotapi.Chattable) {
 		return
 	}
 }
+func SendMessageReturns(ac app.App, c tgbotapi.Chattable) int {
+	id, err := ac.Bot().Send(c)
+
+	if err != nil {
+		log.Println("Error sending message:", err)
+		return 0
+	}
+
+	return id.MessageID
+}
 
 func SendRequest(ac app.App, c tgbotapi.Chattable) {
 	_, err := ac.Bot().Request(c)

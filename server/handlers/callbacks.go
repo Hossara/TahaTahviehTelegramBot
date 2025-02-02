@@ -218,6 +218,7 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 				state.Data["id"] = pID
 				conversations.RemoveProduct(update, ac, state)
 			case "files":
+				commands.GetProductFile(ac, update, int64(id))
 			}
 
 			return

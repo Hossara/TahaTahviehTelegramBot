@@ -1,6 +1,7 @@
 package port
 
 import (
+	"io"
 	"taha_tahvieh_tg_bot/internal/product_storage/domain"
 	storageDomain "taha_tahvieh_tg_bot/internal/storage/domain"
 
@@ -16,7 +17,7 @@ type Service interface {
 	RemoveAllFiles(files []domain.File) error
 	RemoveAllProductFiles(productID productDomain.ProductID, files []domain.File) error
 
-	GetProductFiles(productID productDomain.ProductID) ([]*domain.File, error)
+	GetProductFile(files domain.File) (io.ReadCloser, error)
 
 	RunMigrations() error
 }

@@ -36,7 +36,6 @@ func (s *storageBucket) StreamFile(bucket, name string) (io.ReadCloser, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer object.Close()
 
 	return object, nil
 }

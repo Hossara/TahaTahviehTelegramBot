@@ -3,11 +3,13 @@ package commands
 import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"io"
 	"log"
 	"strconv"
 	"taha_tahvieh_tg_bot/app"
 	productDomain "taha_tahvieh_tg_bot/internal/product/domain"
 	psDomain "taha_tahvieh_tg_bot/internal/product_storage/domain"
+	"taha_tahvieh_tg_bot/pkg/adapters/storage"
 	"taha_tahvieh_tg_bot/pkg/bot"
 	"taha_tahvieh_tg_bot/pkg/utils"
 	"taha_tahvieh_tg_bot/server/constants"
@@ -95,6 +97,74 @@ func UpdateProductMenu(ac app.App, update tgbotapi.Update, id int) {
 			{Path: fmt.Sprintf("%s?pid=%d&field=%s", base, id, "files"), Name: "فایل های محصول", IsAdmin: false},
 		},
 	}, false)
+
+	bot.SendMessage(ac, msg)
+}
+
+func GetProductFile(ac app.App, update tgbotapi.Update, id int64) {
+	product, err := ac.ProductService().GetProduct(productDomain.ProductID(id))
+
+	if err != nil {
+		log.Println(err)
+		bot.SendText(ac, update, "خطا هنگام خواندن اطلاعات محصول!")
+		return
+	}
+
+	if product.Files == nil || len(product.Files) == 0 {
+		bot.SendText(ac, update, "فایلی برای این محصول ثبت نشده!")
+		return
+	}
+
+	fileCount := len(product.Files)
+	fileSent := 0
+
+	getText := func(sent, count int) string {
+		return fmt.Sprintf(
+			"درحال دانلود و ارسال فایل های محصول:\n"+
+				"فایل %d از %d", sent, count,
+		)
+	}
+	msg := tgbotapi.NewMessage(update.FromChat().ID, getText(fileSent, fileCount))
+
+	msgId := bot.SendMessageReturns(ac, msg)
+
+	for _, file := range product.Files {
+		fileSent++
+		fileReader, err := ac.StorageService().GetProductFile(file)
+
+		bot.SendMessage(ac, tgbotapi.NewEditMessageText(update.FromChat().ID, msgId, getText(fileSent, fileCount)))
+
+		if err != nil {
+			log.Println(err)
+			bot.SendText(ac, update, fmt.Sprintf("خطا هنگام دانلود فایل %d ام!", fileSent))
+			continue
+		}
+
+		fileData, err := io.ReadAll(fileReader)
+		if err != nil {
+			log.Println(err)
+			bot.SendText(ac, update, fmt.Sprintf("خطا هنگام خواندن فایل %d ام!", fileSent))
+			continue
+		}
+
+		doc := tgbotapi.NewDocument(update.FromChat().ID, tgbotapi.FileBytes{
+			Name:  storage.FileName(file.UUID.String(), file.Format),
+			Bytes: fileData,
+		})
+
+		doc.Caption = storage.FileName(file.UUID.String(), file.Format)
+
+		bot.SendMessage(ac, doc)
+
+		fileReader.Close()
+	}
+
+	msg = tgbotapi.NewMessage(update.FromChat().ID, "فایل های محصول خدمت شما!")
+
+	msg.ReplyMarkup = keyboards.InlineKeyboardColumn([]menus.MenuItem{
+		{Path: "/menu", IsAdmin: true, Name: "منو اصلی"},
+		{Path: fmt.Sprintf("/product/product/get?pid=%d", id), IsAdmin: true, Name: "مشاهده محصول"},
+	}, true)
 
 	bot.SendMessage(ac, msg)
 }
