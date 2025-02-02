@@ -153,33 +153,6 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 		)
 	})
 
-	r.Handle("/product/action/{action}/{product}", func(vars router.PathVars, queries router.UrlQueries) {
-		id, err := strconv.ParseUint(vars["product"], 10, 64)
-
-		if err != nil || id == 0 {
-			bot.SendText(ac, update, "محصول نامعتبر است!")
-			return
-		}
-
-		switch vars["action"] {
-		// See product
-		case "get":
-
-		case "add":
-			if !bot.IsSuperRole(update, ac) {
-				return
-			}
-		case "remove":
-			if !bot.IsSuperRole(update, ac) {
-				return
-			}
-		case "update":
-			if !bot.IsSuperRole(update, ac) {
-				return
-			}
-		}
-	})
-
 	// -------------------- FAQ
 	r.Handle("/faq", func(vars router.PathVars, queries router.UrlQueries) {
 		commands.FaqList(ac, update)
