@@ -213,13 +213,37 @@ func (r *service) UpdateProduct(id productDomain.ProductID, updates map[string]i
 }
 
 func (r *service) UpdateBrand(id productDomain.BrandID, updates map[string]interface{}) error {
-	//TODO implement me
-	panic("implement me")
+	if id == 0 {
+		return ErrInvalidID
+	}
+
+	if len(updates) == 0 {
+		return nil
+	}
+
+	err := r.metaRepo.UpdateBrand(id, updates)
+
+	if err != nil {
+		return fmt.Errorf("error updating brand: %w", err)
+	}
+	return nil
 }
 
 func (r *service) UpdateProductType(id productDomain.ProductTypeID, updates map[string]interface{}) error {
-	//TODO implement me
-	panic("implement me")
+	if id == 0 {
+		return ErrInvalidID
+	}
+
+	if len(updates) == 0 {
+		return nil
+	}
+
+	err := r.metaRepo.UpdateProductType(id, updates)
+
+	if err != nil {
+		return fmt.Errorf("error updating product type: %w", err)
+	}
+	return nil
 }
 
 func (r *service) RunProductMigrations() error {

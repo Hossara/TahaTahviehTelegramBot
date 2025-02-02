@@ -193,12 +193,27 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 			typeID, typeErr := strconv.Atoi(typeQ)
 
 			if vars["entity"] == "brand" && brandOk && brandErr == nil {
-				commands.RemoveBrand(ac, update, brandID)
+				if vars["action"] == "remove" {
+					commands.RemoveBrand(ac, update, brandID)
+				}
+				if vars["action"] == "update" {
+					state := bot.ResetUserState(update, ac)
+					state.Data["id"] = brandQ
+					conversations.UpdateBrand(update, ac, state)
+				}
 				return
 			}
 
 			if vars["entity"] == "type" && typeOk && typeErr == nil {
-				commands.RemoveType(ac, update, typeID)
+				if vars["action"] == "remove" {
+					commands.RemoveType(ac, update, typeID)
+				}
+				if vars["action"] == "update" {
+					state := bot.ResetUserState(update, ac)
+					state.Data["id"] = typeQ
+					conversations.UpdateProductType(update, ac, state)
+
+				}
 				return
 			}
 
