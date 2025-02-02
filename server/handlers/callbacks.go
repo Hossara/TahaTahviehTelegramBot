@@ -95,8 +95,6 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 		}
 
 		switch vars["query"] {
-		case "product":
-			commands.ProductManagementMenu(ac, update, menus.ManageProductMenu)
 		case "brands":
 			commands.ProductManagementMenu(ac, update, menus.ManageBrandMenu)
 		case "product_types":
@@ -150,15 +148,14 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 		}
 
 		categoryText := map[string]string{
-			"product": "محصول", "brand": "برند",
-			"type": "دسته‌بندی محصول",
+			"brand": "برند", "type": "دسته‌بندی محصول",
 		}
 
 		commands.SelectProductMenu(
 			ac, update, vars["action"], vars["entity"],
 			fmt.Sprintf(
 				"جهت %s هر %s، بر روی نام آن کلیک کنید.",
-				actionText[vars["action"]], categoryText["entity"],
+				actionText[vars["action"]], categoryText[vars["entity"]],
 			),
 			page, update.CallbackQuery.Message.MessageID,
 			map[string]string{},

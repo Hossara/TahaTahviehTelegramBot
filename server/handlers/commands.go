@@ -26,27 +26,10 @@ func HandleCommands(update tgbotapi.Update, ac app.App) {
 		commands.SearchProductMenu(ac, update)
 
 	// -------------------- Manage Product
-	case "manage_product":
-		commands.ProductManagementMenu(ac, update, menus.ManageProductMenu)
 	case "manage_brands":
 		commands.ProductManagementMenu(ac, update, menus.ManageBrandMenu)
 	case "manage_product_types":
 		commands.ProductManagementMenu(ac, update, menus.ManageProductTypeMenu)
-
-	// -------------------- Products
-	case "add_product":
-	case "remove_product":
-	case "update_product":
-
-	// -------------------- Product Types
-	case "add_product_type":
-	case "remove_product_type":
-	case "update_product_type":
-
-	// -------------------- Brand
-	case "add_brand":
-	case "remove_brand":
-	case "update_brand":
 
 	// -------------------- FAQ
 	case "faq":

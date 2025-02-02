@@ -9,18 +9,6 @@ var SearchProductMenu = [][]MenuItem{
 	},
 }
 
-var ManageProductMenu = [][]MenuItem{
-	{
-		{Path: "/product/product/add", IsAdmin: true, Name: "افزودن محصول"},
-	},
-	{
-		{Path: "/product/product/remove?page=1", IsAdmin: true, Name: "حذف محصول"},
-	},
-	{
-		{Path: "/product/product/update?page=1", IsAdmin: true, Name: "ویرایش محصول"},
-	},
-}
-
 var ManageProductTypeMenu = [][]MenuItem{
 	{
 		{Path: "/product/type/add", IsAdmin: true, Name: "افزودن دسته‌بندی محصول"},
