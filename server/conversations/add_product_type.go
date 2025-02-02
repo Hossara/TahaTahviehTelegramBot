@@ -55,6 +55,7 @@ func AddProductType(update tgbotapi.Update, ac app.App, state *app.UserState) {
 		)
 
 		msg.ReplyMarkup = keyboards.InlineKeyboardColumn([]menus.MenuItem{
+			{Path: "/manage/product_types", IsAdmin: true, Name: "مدیریت دسته‌بندی ها"},
 			{Path: "/menu", IsAdmin: true, Name: "منو اصلی"},
 		}, true)
 

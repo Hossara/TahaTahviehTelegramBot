@@ -8,6 +8,8 @@ import (
 	"taha_tahvieh_tg_bot/app"
 	"taha_tahvieh_tg_bot/internal/product/domain"
 	"taha_tahvieh_tg_bot/pkg/bot"
+	"taha_tahvieh_tg_bot/server/keyboards"
+	"taha_tahvieh_tg_bot/server/menus"
 )
 
 func AddBrand(update tgbotapi.Update, ac app.App, state *app.UserState) {
@@ -47,7 +49,17 @@ func AddBrand(update tgbotapi.Update, ac app.App, state *app.UserState) {
 			return
 		}
 
-		bot.SendText(ac, update, fmt.Sprintf("برند %s با موفقیت اضافه شد.", state.Data["name"]))
+		msg := tgbotapi.NewMessage(
+			update.FromChat().ID,
+			fmt.Sprintf("برند %s با موفقیت اضافه شد.", state.Data["name"]),
+		)
+
+		msg.ReplyMarkup = keyboards.InlineKeyboardColumn([]menus.MenuItem{
+			{Path: "/manage/brands", IsAdmin: true, Name: "مدیریت برند ها"},
+			{Path: "/menu", IsAdmin: true, Name: "منو اصلی"},
+		}, true)
+
+		bot.SendMessage(ac, msg)
 
 		state.Active = false
 		ac.DeleteUserState(update.SentFrom().ID)
