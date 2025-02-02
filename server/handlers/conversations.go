@@ -32,6 +32,10 @@ func HandleConversations(update tgbotapi.Update, ac app.App) {
 		switch userState.Conversation {
 		case "add_product":
 			conversations.AddProduct(update, ac, userState, 0, 0, 1, 0)
+
+		case "update_product_meta":
+			conversations.UpdateProductMeta(update, ac, userState, 0, 1, 0)
+
 		}
 	}
 }

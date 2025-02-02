@@ -179,8 +179,29 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 						state.Data["id"] = pID
 						state.Data["field"] = field
 						conversations.UpdateProductInfo(update, ac, state)
-					case "brand":
-					case "type":
+					case "brand", "type":
+						metaId := 0
+						brandQ, brandOk := queries["brand"]
+						typeQ, typeOk := queries["type"]
+						var state *app.UserState
+
+						brandID, brandErr := strconv.Atoi(brandQ)
+						typeID, typeErr := strconv.Atoi(typeQ)
+
+						if brandOk && brandErr == nil && brandID != 0 {
+							metaId = brandID
+							state = ac.AppState(update.SentFrom().ID)
+						} else if typeOk && typeErr == nil && typeID != 0 {
+							metaId = typeID
+							state = ac.AppState(update.SentFrom().ID)
+						} else {
+							state = bot.ResetUserState(update, ac)
+
+							state.Data["id"] = pID
+							state.Data["field"] = field
+						}
+
+						conversations.UpdateProductMeta(update, ac, state, metaId, page, msID)
 					case "files":
 					}
 				} else {

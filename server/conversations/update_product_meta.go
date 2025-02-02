@@ -5,24 +5,24 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
 	"strconv"
-	"strings"
 	"taha_tahvieh_tg_bot/app"
 	productDomain "taha_tahvieh_tg_bot/internal/product/domain"
 	"taha_tahvieh_tg_bot/pkg/bot"
+	"taha_tahvieh_tg_bot/server/commands"
 	"taha_tahvieh_tg_bot/server/keyboards"
 	"taha_tahvieh_tg_bot/server/menus"
 )
 
-func UpdateProductInfo(update tgbotapi.Update, ac app.App, state *app.UserState) {
+func UpdateProductMeta(update tgbotapi.Update, ac app.App, state *app.UserState, id, page, prev int) {
 	var names = map[string]string{
-		"title":       "نام",
-		"description": "توضیحات",
+		"brand": "برند",
+		"type":  "دسته‌بندی",
 	}
 
 	switch state.Step {
 	case 0:
 		state.Active = true
-		state.Conversation = "update_product_info"
+		state.Conversation = "update_product_meta"
 
 		field := state.Data["field"]
 		if field == "" {
@@ -30,23 +30,31 @@ func UpdateProductInfo(update tgbotapi.Update, ac app.App, state *app.UserState)
 			return
 		}
 
-		bot.SendText(ac, update, fmt.Sprintf("%s جدید محصول خود را بنویسید.", names[field]))
-		state.Step = 1
+		if id == 0 {
+			commands.SelectProductMenu(
+				ac, update, "update_product", field,
+				fmt.Sprintf("لطفا %s جدید محصول را انتخاب کنید", names[field]),
+				page, prev, map[string]string{
+					"pid": state.Data["id"],
+				},
+			)
+		} else {
+			state.Data["meta_id"] = strconv.Itoa(id)
+
+			state.Step = 1
+			UpdateProductMeta(update, ac, state, id, page, prev)
+		}
 	case 1:
+		pIDQ, pIDOk := state.Data["id"]
+		metaIDQ, metaIDOk := state.Data["meta_id"]
 		field := state.Data["field"]
+
 		if field == "" {
 			bot.SendText(ac, update, "فیلد ویرایش نامشخص")
 			return
 		}
 
-		if update.Message.Text == "" {
-			bot.SendText(ac, update, fmt.Sprintf("لطفا یک %s معتبر ارسال کنید!", names[field]))
-			return
-		}
-
-		bot.SendText(ac, update, fmt.Sprintf("درحال ویرایش %s محصول...", names[field]))
-
-		pIDQ, pIDOk := state.Data["id"]
+		metaID, metaIDErr := strconv.Atoi(metaIDQ)
 		pID, pIDErr := strconv.Atoi(pIDQ)
 
 		if !pIDOk || pIDErr != nil {
@@ -55,8 +63,14 @@ func UpdateProductInfo(update tgbotapi.Update, ac app.App, state *app.UserState)
 			return
 		}
 
+		if !metaIDOk || metaIDErr != nil {
+			log.Println(pIDErr)
+			bot.SendText(ac, update, fmt.Sprintf("%s نامعتبر!", names[field]))
+			return
+		}
+
 		err := ac.ProductService().UpdateProduct(productDomain.ProductID(pID), map[string]interface{}{
-			fmt.Sprintf("%s", field): strings.TrimSpace(update.Message.Text),
+			fmt.Sprintf("%s_id", field): metaID,
 		})
 
 		if err != nil {

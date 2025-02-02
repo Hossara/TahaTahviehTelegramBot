@@ -86,10 +86,10 @@ func UpdateProductMenu(ac app.App, update tgbotapi.Update, id int) {
 			{Path: fmt.Sprintf("%s?pid=%d&field=%s", base, id, "title"), Name: "نام محصول", IsAdmin: false},
 		},
 		{
-			{Path: fmt.Sprintf("%s?pid=%d&field=%s", base, id, "brand"), Name: "برند محصول", IsAdmin: false},
+			{Path: fmt.Sprintf("%s?pid=%d&field=%s&page=1", base, id, "brand"), Name: "برند محصول", IsAdmin: false},
 		},
 		{
-			{Path: fmt.Sprintf("%s?pid=%d&field=%s", base, id, "type"), Name: "دسته‌بندی محصول", IsAdmin: false},
+			{Path: fmt.Sprintf("%s?pid=%d&field=%s&page=1", base, id, "type"), Name: "دسته‌بندی محصول", IsAdmin: false},
 		},
 		{
 			{Path: fmt.Sprintf("%s?pid=%d&field=%s", base, id, "files"), Name: "فایل های محصول", IsAdmin: false},
@@ -178,29 +178,41 @@ func SelectProductMenu(ac app.App, update tgbotapi.Update, action, menu, text st
 		}
 
 		act := map[string]string{
-			"search":      "/search/type",
-			"add_product": "/product/product/add",
-			"remove":      "/product/brand/remove",
-			"update":      "/product/brand/update",
+			"search":         "/search/type",
+			"add_product":    "/product/product/add",
+			"remove":         "/product/brand/remove",
+			"update":         "/product/brand/update",
+			"update_product": "/product/product/update",
 		}
+
+		pID, pidOK := meta["pid"]
 
 		menuItems = utils.Map(brands.Data, func(t *productDomain.Brand) menus.MenuItem {
 			return menus.MenuItem{
 				Name: t.Title, IsAdmin: false,
-				Path: fmt.Sprintf("%s?page=1&brand=%d", act[action], t.ID),
+				Path: fmt.Sprintf(
+					"%s?page=1&brand=%d&field=%s%s",
+					act[action], t.ID, menu,
+					utils.IfThenElse(pidOK, "&pid="+pID, ""),
+				),
 			}
 		})
 
 		nav := map[string]string{
-			"search":      "/search/brand",
-			"add_product": "/product/product/add",
-			"remove":      "/product/brand/remove",
-			"update":      "/product/brand/update",
+			"search":         "/search/brand",
+			"remove":         "/product/brand/remove",
+			"update":         "/product/brand/update",
+			"add_product":    "/product/product/add",
+			"update_product": "/product/product/update",
 		}
 
 		keyboard = keyboards.InlinePaginationColumnKeyboard(
 			addMain(menuItems), false,
-			page, brands.Pages, fmt.Sprintf("%s?page=%d", nav[action], page), "page")
+			page, brands.Pages, fmt.Sprintf(
+				"%s?page=%d&field=%s%s",
+				nav[action], page, menu,
+				utils.IfThenElse(pidOK, "&pid="+pID, ""),
+			), "page")
 	case "type":
 		brandID, _ := strconv.Atoi(meta["brand"])
 
@@ -213,29 +225,41 @@ func SelectProductMenu(ac app.App, update tgbotapi.Update, action, menu, text st
 		}
 
 		act := map[string]string{
-			"search":      "/search/product",
-			"add_product": "/product/product/add",
-			"remove":      "/product/type/remove",
-			"update":      "/product/type/update",
+			"search":         "/search/product",
+			"add_product":    "/product/product/add",
+			"remove":         "/product/type/remove",
+			"update":         "/product/type/update",
+			"update_product": "/product/product/update",
 		}
+
+		pID, pidOK := meta["pid"]
 
 		menuItems = utils.Map(types.Data, func(t *productDomain.ProductType) menus.MenuItem {
 			return menus.MenuItem{
 				Name: t.Title, IsAdmin: false,
-				Path: fmt.Sprintf("%s?page=1&brand=%d&type=%d", act[action], brandID, t.ID),
+				Path: fmt.Sprintf(
+					"%s?page=1&brand=%d&type=%d&field=%s%s",
+					act[action], brandID, t.ID, menu,
+					utils.IfThenElse(pidOK, "&pid="+pID, ""),
+				),
 			}
 		})
 
 		nav := map[string]string{
-			"search":      "/search/type",
-			"add_product": "/product/product/add",
-			"remove":      "/product/type/remove",
-			"update":      "/product/type/update",
+			"search":         "/search/type",
+			"add_product":    "/product/product/add",
+			"remove":         "/product/type/remove",
+			"update":         "/product/type/update",
+			"update_product": "/product/product/update",
 		}
 
 		keyboard = keyboards.InlinePaginationColumnKeyboard(
 			addMain(menuItems), false,
-			page, types.Pages, fmt.Sprintf("%s?page=%d&brand=%d", nav[action], page, brandID), "page")
+			page, types.Pages, fmt.Sprintf(
+				"%s?page=%d&brand=%d&field=%s%s",
+				nav[action], page, brandID, menu,
+				utils.IfThenElse(pidOK, "&pid="+pID, ""),
+			), "page")
 	}
 
 	send(ac, update, text, page, prev, keyboard)
