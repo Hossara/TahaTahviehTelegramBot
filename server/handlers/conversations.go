@@ -9,11 +9,11 @@ import (
 var gaps = map[string]func(update tgbotapi.Update, ac app.App, state *app.UserState){
 	"add_brand":        conversations.AddBrand,
 	"add_product_type": conversations.AddProductType,
-
-	"update_about": conversations.UpdateAbout,
-	"update_help":  conversations.UpdateHelp,
-	"add_faq":      conversations.AddFaq,
-	"update_faq":   conversations.UpdateFaq,
+	"remove_product":   conversations.RemoveProduct,
+	"update_about":     conversations.UpdateAbout,
+	"update_help":      conversations.UpdateHelp,
+	"add_faq":          conversations.AddFaq,
+	"update_faq":       conversations.UpdateFaq,
 }
 
 func HandleConversations(update tgbotapi.Update, ac app.App) {

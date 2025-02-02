@@ -152,7 +152,7 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 			return
 		}
 
-		if vars["entity"] == "product" && vars["action"] == "get" {
+		if vars["entity"] == "product" {
 			pID, idOk := queries["pid"]
 
 			id, idErr := strconv.Atoi(pID)
@@ -163,7 +163,17 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 				return
 			}
 
-			commands.GetProduct(ac, update, int64(id))
+			switch vars["action"] {
+			case "get":
+				commands.GetProduct(ac, update, int64(id))
+			case "update":
+			case "remove":
+				state := bot.ResetUserState(update, ac)
+				state.Data["id"] = pID
+				conversations.RemoveProduct(update, ac, state)
+			case "files":
+			}
+
 			return
 		}
 
@@ -176,23 +186,25 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 			return
 		}
 
-		actionText := map[string]string{
-			"remove": "حذف", "update": "ویرایش",
-		}
+		if vars["entity"] == "brand" || vars["entity"] == "type" {
+			actionText := map[string]string{
+				"remove": "حذف", "update": "ویرایش",
+			}
 
-		categoryText := map[string]string{
-			"brand": "برند", "type": "دسته‌بندی محصول",
-		}
+			categoryText := map[string]string{
+				"brand": "برند", "type": "دسته‌بندی محصول",
+			}
 
-		commands.SelectProductMenu(
-			ac, update, vars["action"], vars["entity"],
-			fmt.Sprintf(
-				"جهت %s هر %s، بر روی نام آن کلیک کنید.",
-				actionText[vars["action"]], categoryText[vars["entity"]],
-			),
-			page, update.CallbackQuery.Message.MessageID,
-			map[string]string{},
-		)
+			commands.SelectProductMenu(
+				ac, update, vars["action"], vars["entity"],
+				fmt.Sprintf(
+					"جهت %s هر %s، بر روی نام آن کلیک کنید.",
+					actionText[vars["action"]], categoryText[vars["entity"]],
+				),
+				page, update.CallbackQuery.Message.MessageID,
+				map[string]string{},
+			)
+		}
 	})
 
 	// -------------------- FAQ
