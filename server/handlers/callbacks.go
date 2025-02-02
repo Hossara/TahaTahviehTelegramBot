@@ -174,7 +174,7 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 
 				if fieldOk && field != "" {
 					switch field {
-					case "name", "description":
+					case "title", "description":
 						state := bot.ResetUserState(update, ac)
 						state.Data["id"] = pID
 						state.Data["field"] = field

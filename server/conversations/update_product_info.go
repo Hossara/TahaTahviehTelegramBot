@@ -14,7 +14,7 @@ import (
 )
 
 var names = map[string]string{
-	"name":        "نام",
+	"title":       "نام",
 	"description": "توضیحات",
 }
 

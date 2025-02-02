@@ -83,7 +83,7 @@ func UpdateProductMenu(ac app.App, update tgbotapi.Update, id int) {
 	msg.ReplyMarkup = keyboards.InlineKeyboard([][]menus.MenuItem{
 		{
 			{Path: fmt.Sprintf("%s?pid=%d&field=%s", base, id, "description"), Name: "توضیحات محصول", IsAdmin: false},
-			{Path: fmt.Sprintf("%s?pid=%d&field=%s", base, id, "name"), Name: "نام محصول", IsAdmin: false},
+			{Path: fmt.Sprintf("%s?pid=%d&field=%s", base, id, "title"), Name: "نام محصول", IsAdmin: false},
 		},
 		{
 			{Path: fmt.Sprintf("%s?pid=%d&field=%s", base, id, "brand"), Name: "برند محصول", IsAdmin: false},
