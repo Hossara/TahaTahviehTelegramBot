@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"log"
 	"strconv"
 	"taha_tahvieh_tg_bot/app"
 	"taha_tahvieh_tg_bot/pkg/bot"
@@ -85,6 +86,23 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 				"برند مورد نظر خود را انتخاب کنید",
 				page, msID, map[string]string{},
 			)
+
+		case "product":
+			brandQ, brandOk := queries["brand"]
+			typeQ, typeOk := queries["type"]
+			title, titleOk := queries["title"]
+
+			brandID, brandErr := strconv.Atoi(brandQ)
+			typeID, typeErr := strconv.Atoi(typeQ)
+
+			if titleOk {
+				commands.ProductList(ac, update, 0, 0, title, page, msID)
+			} else if typeOk && typeErr == nil && brandOk && brandErr == nil {
+				commands.ProductList(ac, update, int64(brandID), int64(typeID), "", page, msID)
+			} else {
+				log.Println(typeErr)
+				log.Println(brandErr)
+			}
 		}
 	})
 
@@ -131,6 +149,21 @@ func HandleCallbacks(update tgbotapi.Update, ac app.App) {
 			case "type":
 				conversations.AddProductType(update, ac, state)
 			}
+			return
+		}
+
+		if vars["entity"] == "product" && vars["action"] == "get" {
+			pID, idOk := queries["pid"]
+
+			id, idErr := strconv.Atoi(pID)
+
+			if !idOk || idErr != nil {
+				log.Println(idErr)
+				bot.SendText(ac, update, "محصول نامعتبر!")
+				return
+			}
+
+			commands.GetProduct(ac, update, int64(id))
 			return
 		}
 

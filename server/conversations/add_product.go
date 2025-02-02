@@ -180,7 +180,6 @@ func AddProduct(update tgbotapi.Update, ac app.App, state *app.UserState, brandI
 			msg := tgbotapi.NewMessage(update.FromChat().ID, "محصول با موفقیت افزوده شد!")
 
 			msg.ReplyMarkup = keyboards.InlineKeyboardColumn([]menus.MenuItem{
-				{Path: "/manage/product", IsAdmin: true, Name: "مدیریت محصولات"},
 				{Path: "/menu", IsAdmin: true, Name: "منو اصلی"},
 			}, true)
 
